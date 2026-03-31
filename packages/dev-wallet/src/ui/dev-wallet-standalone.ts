@@ -5,7 +5,7 @@ import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
 import type { DevWallet } from '../wallet/dev-wallet.js';
-import { connectDialogStyles, sharedStyles } from './styles.js';
+import { actionBarStyles, connectDialogStyles, sharedStyles } from './styles.js';
 import { WalletController } from './wallet-controller.js';
 
 @customElement('dev-wallet-standalone')
@@ -13,6 +13,7 @@ export class DevWalletStandalone extends LitElement {
 	static override styles = [
 		sharedStyles,
 		connectDialogStyles,
+		actionBarStyles,
 		css`
 			:host {
 				display: flex;
@@ -27,7 +28,6 @@ export class DevWalletStandalone extends LitElement {
 				max-width: 480px;
 				border-radius: var(--dev-wallet-radius-xl);
 				background: var(--dev-wallet-background);
-				border: 1px solid var(--dev-wallet-border);
 				box-shadow: var(--dev-wallet-shadow-lg);
 				overflow: hidden;
 				display: flex;
@@ -44,7 +44,7 @@ export class DevWalletStandalone extends LitElement {
 			}
 
 			.card-title {
-				font-size: 17px;
+				font-size: 16px;
 				font-weight: var(--dev-wallet-font-weight-semibold);
 				color: var(--dev-wallet-foreground);
 			}
@@ -52,19 +52,25 @@ export class DevWalletStandalone extends LitElement {
 			.header-right {
 				display: flex;
 				align-items: center;
-				gap: 8px;
+				gap: 10px;
+			}
+
+			.status-indicator {
+				display: flex;
+				align-items: center;
+				gap: 5px;
 			}
 
 			.status-dot {
-				width: 8px;
-				height: 8px;
+				width: 6px;
+				height: 6px;
 				border-radius: 50%;
 				background: var(--dev-wallet-status-connected);
 			}
 
 			.status-text {
 				font-size: 11px;
-				color: var(--dev-wallet-muted-foreground);
+				color: var(--dev-wallet-tertiary);
 			}
 
 			.card-body {
@@ -117,8 +123,10 @@ export class DevWalletStandalone extends LitElement {
 					<span class="card-title">${this.wallet?.name ?? 'Dev Wallet'}</span>
 					<div class="header-right">
 						${this.#ctrl.renderNetworkBadge()}
-						<span class="status-dot"></span>
-						<span class="status-text">Running</span>
+						<div class="status-indicator">
+							<span class="status-dot"></span>
+							<span class="status-text">Running</span>
+						</div>
 					</div>
 				</div>
 				<div class="card-body">${this.#ctrl.renderTabContent()}</div>

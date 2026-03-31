@@ -32,7 +32,6 @@ export class DevWalletSigningModal extends LitElement {
 				max-height: min(600px, 80vh);
 				border-radius: var(--dev-wallet-radius-xl);
 				background: var(--dev-wallet-background);
-				border: 1px solid var(--dev-wallet-border);
 				box-shadow: var(--dev-wallet-shadow-lg);
 				overflow: hidden;
 				display: flex;
@@ -42,19 +41,19 @@ export class DevWalletSigningModal extends LitElement {
 			}
 
 			dialog::backdrop {
-				background: color-mix(in oklab, oklch(0 0 0) 50%, transparent);
+				background: rgba(0, 0, 0, 0.5);
 			}
 
 			.modal-header {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				padding: 14px 16px;
+				padding: 16px 20px;
 				border-bottom: 1px solid var(--dev-wallet-border);
 			}
 
 			.modal-title {
-				font-size: 15px;
+				font-size: 16px;
 				font-weight: var(--dev-wallet-font-weight-semibold);
 				color: var(--dev-wallet-foreground);
 			}

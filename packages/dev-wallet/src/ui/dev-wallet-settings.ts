@@ -22,31 +22,30 @@ export class DevWalletSettings extends LitElement {
 			}
 
 			.section {
-				margin-bottom: 20px;
+				margin-bottom: 28px;
 			}
 
 			.section:last-child {
 				margin-bottom: 0;
 			}
 
+			/* -- Networks --------------------------------------------------- */
+
 			.network-list {
 				display: flex;
 				flex-direction: column;
-				gap: 4px;
 			}
 
 			.network-item {
 				display: flex;
-				align-items: center;
-				gap: 8px;
-				padding: 8px 12px;
-				border-radius: var(--dev-wallet-radius-sm);
-				border: 1px solid var(--dev-wallet-border);
-				background: var(--dev-wallet-secondary);
+				align-items: flex-start;
+				gap: 12px;
+				padding: 14px 0;
+				border-bottom: 1px solid var(--dev-wallet-border);
 			}
 
-			.network-item.active {
-				border-color: var(--dev-wallet-primary);
+			.network-item:last-child {
+				border-bottom: none;
 			}
 
 			.network-dot {
@@ -54,13 +53,7 @@ export class DevWalletSettings extends LitElement {
 				height: 8px;
 				border-radius: 50%;
 				flex-shrink: 0;
-			}
-
-			.network-name {
-				flex: 1;
-				font-size: 13px;
-				font-weight: var(--dev-wallet-font-weight-medium);
-				color: var(--dev-wallet-foreground);
+				margin-top: 5px;
 			}
 
 			.network-info {
@@ -68,9 +61,31 @@ export class DevWalletSettings extends LitElement {
 				min-width: 0;
 			}
 
-			.network-url {
+			.network-name-row {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				margin-bottom: 2px;
+			}
+
+			.network-name {
+				font-size: 14px;
+				font-weight: var(--dev-wallet-font-weight-medium);
+				color: var(--dev-wallet-foreground);
+			}
+
+			.network-active-badge {
 				font-size: 10px;
-				color: var(--dev-wallet-muted-foreground);
+				padding: 2px 8px;
+				border-radius: 999px;
+				background: rgba(0, 178, 255, 0.1);
+				color: var(--dev-wallet-primary);
+				font-weight: var(--dev-wallet-font-weight-medium);
+			}
+
+			.network-url {
+				font-size: 12px;
+				color: var(--dev-wallet-tertiary);
 				font-family: var(--dev-wallet-font-mono);
 				overflow: hidden;
 				text-overflow: ellipsis;
@@ -79,72 +94,71 @@ export class DevWalletSettings extends LitElement {
 
 			.network-url-input {
 				width: 100%;
-				padding: 3px 6px;
-				border-radius: var(--dev-wallet-radius-xs);
-				border: 1px solid var(--dev-wallet-primary);
-				background: var(--dev-wallet-background);
+				padding: 6px 10px;
+				border-radius: var(--dev-wallet-radius-sm);
+				border: 1px solid rgba(255, 255, 255, 0.15);
+				background: var(--dev-wallet-secondary);
 				color: var(--dev-wallet-foreground);
-				font-size: 10px;
+				font-size: 12px;
 				font-family: var(--dev-wallet-font-mono);
 				outline: none;
 				box-sizing: border-box;
+				margin-top: 4px;
+			}
+
+			.network-url-input:focus {
+				border-color: var(--dev-wallet-primary);
 			}
 
 			.network-actions {
 				display: flex;
-				gap: 2px;
+				gap: 4px;
 				flex-shrink: 0;
+				margin-top: 2px;
 			}
 
 			.btn-icon {
-				width: 22px;
-				height: 22px;
+				width: 28px;
+				height: 28px;
 				display: flex;
 				align-items: center;
 				justify-content: center;
 				border-radius: var(--dev-wallet-radius-xs);
-				font-size: 11px;
-				color: var(--dev-wallet-muted-foreground);
+				font-size: 13px;
+				color: var(--dev-wallet-tertiary);
 			}
 
 			.btn-icon:hover {
-				background: var(--dev-wallet-border);
 				color: var(--dev-wallet-foreground);
+				background: rgba(255, 255, 255, 0.06);
 			}
 
 			.btn-icon-danger:hover {
 				color: var(--dev-wallet-destructive);
+				background: rgba(255, 43, 58, 0.08);
 			}
 
-			.network-active-badge {
-				font-size: 9px;
-				padding: 1px 5px;
-				border-radius: var(--dev-wallet-radius-2xs);
-				background: color-mix(in oklab, var(--dev-wallet-primary) 15%, transparent);
-				color: var(--dev-wallet-primary);
-				font-weight: var(--dev-wallet-font-weight-semibold);
-				text-transform: uppercase;
-			}
+			/* -- Add network form --------------------------------------------- */
 
 			.add-network-form {
 				display: flex;
 				flex-direction: column;
-				gap: 8px;
-				margin-top: 8px;
-				padding: 12px;
-				border-radius: var(--dev-wallet-radius-sm);
-				border: 1px dashed var(--dev-wallet-border);
+				gap: 10px;
+				margin-top: 16px;
+				padding: 16px;
+				border-radius: var(--dev-wallet-radius);
+				border: 1px solid var(--dev-wallet-border);
 				background: var(--dev-wallet-secondary);
 			}
 
 			.form-input {
 				width: 100%;
-				padding: 6px 8px;
-				border-radius: var(--dev-wallet-radius-xs);
-				border: 1px solid var(--dev-wallet-input);
+				padding: 10px 12px;
+				border-radius: var(--dev-wallet-radius-sm);
+				border: 1px solid rgba(255, 255, 255, 0.1);
 				background: var(--dev-wallet-background);
 				color: var(--dev-wallet-foreground);
-				font-size: 12px;
+				font-size: 13px;
 				font-family: inherit;
 				outline: none;
 				box-sizing: border-box;
@@ -155,18 +169,19 @@ export class DevWalletSettings extends LitElement {
 			}
 
 			.form-input::placeholder {
-				color: var(--dev-wallet-muted-foreground);
+				color: var(--dev-wallet-tertiary);
 			}
 
 			.form-actions {
 				display: flex;
-				gap: 6px;
+				gap: 8px;
+				justify-content: flex-end;
 			}
 
 			.btn-sm {
-				padding: 5px 10px;
-				border-radius: var(--dev-wallet-radius-xs);
-				font-size: 11px;
+				padding: 8px 16px;
+				border-radius: 999px;
+				font-size: 12px;
 				font-weight: var(--dev-wallet-font-weight-medium);
 			}
 
@@ -176,19 +191,23 @@ export class DevWalletSettings extends LitElement {
 			}
 
 			.btn-add:disabled {
-				opacity: 0.5;
+				opacity: 0.4;
+				cursor: not-allowed;
 			}
 
-			.btn-cancel {
-				background: var(--dev-wallet-secondary);
+			.btn-cancel-sm {
+				background: transparent;
+				color: var(--dev-wallet-muted-foreground);
+			}
+
+			.btn-cancel-sm:hover {
 				color: var(--dev-wallet-foreground);
-				border: 1px solid var(--dev-wallet-border);
 			}
 
 			.btn-toggle {
-				font-size: 12px;
+				font-size: 13px;
 				color: var(--dev-wallet-primary);
-				padding: 4px 0;
+				padding: 8px 0;
 				margin-top: 4px;
 			}
 
@@ -196,60 +215,71 @@ export class DevWalletSettings extends LitElement {
 				text-decoration: underline;
 			}
 
+			/* -- CLI Signer ------------------------------------------------- */
+
 			.cli-section-column {
 				flex-direction: column;
 				align-items: flex-start;
-				gap: 6px;
+				gap: 8px;
 			}
 
 			.cli-header-row {
 				display: flex;
 				align-items: center;
-				gap: 8px;
+				gap: 10px;
 				width: 100%;
 			}
 
 			.cli-accounts-list {
 				width: 100%;
-				padding-left: 16px;
+				padding-left: 20px;
 			}
 
 			.cli-accounts-list .network-url {
-				padding: 2px 0;
+				padding: 3px 0;
 			}
 
 			.cli-hint {
-				padding-left: 16px;
+				padding-left: 20px;
 				margin-top: 0;
-				font-size: 12px;
+				font-size: 13px;
 			}
 
 			.cli-unpaired-hint {
-				margin-top: 8px;
+				margin-top: 10px;
 			}
 
+			/* -- About / general text --------------------------------------- */
+
 			.about {
-				font-size: 12px;
+				font-size: 13px;
 				color: var(--dev-wallet-muted-foreground);
-				line-height: 1.5;
+				line-height: 1.6;
+			}
+
+			.about strong {
+				color: var(--dev-wallet-foreground);
+				font-weight: var(--dev-wallet-font-weight-medium);
 			}
 
 			.error {
-				font-size: 11px;
+				font-size: 12px;
 				color: var(--dev-wallet-destructive);
-				margin-top: 4px;
+				margin-top: 6px;
 			}
 
+			/* -- Bookmarklet ------------------------------------------------ */
+
 			.bookmarklet-link-wrapper {
-				margin-top: 8px;
+				margin-top: 12px;
 			}
 
 			.bookmarklet-link {
 				display: inline-flex;
 				align-items: center;
 				gap: 6px;
-				padding: 8px 14px;
-				border-radius: var(--dev-wallet-radius-sm);
+				padding: 10px 18px;
+				border-radius: 999px;
 				background: var(--dev-wallet-primary);
 				color: var(--dev-wallet-primary-foreground);
 				font-size: 13px;
@@ -260,7 +290,7 @@ export class DevWalletSettings extends LitElement {
 			}
 
 			.bookmarklet-link:hover {
-				opacity: 0.9;
+				filter: brightness(0.9);
 			}
 
 			.bookmarklet-link:active {
@@ -269,23 +299,23 @@ export class DevWalletSettings extends LitElement {
 
 			.bookmarklet-url {
 				font-family: var(--dev-wallet-font-mono);
-				font-size: 10px;
-				color: var(--dev-wallet-muted-foreground);
+				font-size: 11px;
+				color: var(--dev-wallet-tertiary);
 				word-break: break-all;
 				user-select: all;
 			}
 
 			.console-snippet {
 				position: relative;
-				margin-top: 8px;
-				padding: 10px 12px;
-				border-radius: var(--dev-wallet-radius-sm);
+				margin-top: 10px;
+				padding: 14px 16px;
+				border-radius: var(--dev-wallet-radius);
 				background: var(--dev-wallet-secondary);
 				border: 1px solid var(--dev-wallet-border);
 				font-family: var(--dev-wallet-font-mono);
-				font-size: 11px;
+				font-size: 12px;
 				color: var(--dev-wallet-foreground);
-				line-height: 1.5;
+				line-height: 1.6;
 				white-space: pre-wrap;
 				word-break: break-all;
 				user-select: all;
@@ -293,19 +323,19 @@ export class DevWalletSettings extends LitElement {
 
 			.btn-copy {
 				position: absolute;
-				top: 6px;
-				right: 6px;
-				padding: 3px 8px;
-				border-radius: var(--dev-wallet-radius-xs);
-				background: var(--dev-wallet-border);
+				top: 8px;
+				right: 8px;
+				padding: 4px 10px;
+				border-radius: 999px;
+				background: rgba(255, 255, 255, 0.08);
 				color: var(--dev-wallet-muted-foreground);
-				font-size: 10px;
+				font-size: 11px;
 				font-family: inherit;
 				cursor: pointer;
 			}
 
 			.btn-copy:hover {
-				background: var(--dev-wallet-input);
+				background: rgba(255, 255, 255, 0.12);
 				color: var(--dev-wallet-foreground);
 			}
 		`,
@@ -370,14 +400,19 @@ export class DevWalletSettings extends LitElement {
 			<h3 class="section-header">Networks</h3>
 			<div class="network-list">
 				${networks.map((name) => {
-					const color = NETWORK_COLORS[name] ?? '#6b7280';
+					const color = NETWORK_COLORS[name] ?? 'rgba(255,255,255,0.3)';
 					const isActive = name === activeNetwork;
 					const isEditing = this._editingNetwork === name;
 					return html`
-						<div class="network-item ${isActive ? 'active' : ''}">
+						<div class="network-item">
 							<span class="network-dot" style="background: ${color}"></span>
 							<div class="network-info">
-								<span class="network-name">${name}</span>
+								<div class="network-name-row">
+									<span class="network-name">${name}</span>
+									${isActive
+										? html`<span class="network-active-badge">Active</span>`
+										: nothing}
+								</div>
 								${isEditing
 									? html`<input
 											class="network-url-input"
@@ -435,7 +470,6 @@ export class DevWalletSettings extends LitElement {
 													</button>`
 												: nothing}
 										`}
-								${isActive ? html`<span class="network-active-badge">Active</span>` : nothing}
 							</div>
 						</div>
 					`;
@@ -492,7 +526,7 @@ export class DevWalletSettings extends LitElement {
 					>
 						Add
 					</button>
-					<button class="btn-sm btn-cancel" @click=${this.#cancelAddNetwork}>Cancel</button>
+					<button class="btn-sm btn-cancel-sm" @click=${this.#cancelAddNetwork}>Cancel</button>
 				</div>
 			</div>
 		`;

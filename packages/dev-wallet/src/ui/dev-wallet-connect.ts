@@ -27,102 +27,112 @@ export class DevWalletConnect extends LitElement {
 
 			.connect-content {
 				flex: 1;
-				padding: 16px;
+				padding: 20px;
 			}
 
 			.connect-header {
-				text-align: center;
-				margin-bottom: 12px;
+				margin-bottom: 16px;
 			}
 
 			.connect-title {
-				font-size: 14px;
+				font-size: 16px;
 				font-weight: var(--dev-wallet-font-weight-semibold);
 				color: var(--dev-wallet-foreground);
 			}
 
 			.connect-desc {
-				font-size: 12px;
+				font-size: 13px;
 				color: var(--dev-wallet-muted-foreground);
 				margin-top: 4px;
 			}
 
 			.app-info {
-				margin-top: 8px;
+				margin-top: 12px;
+				padding: 12px 14px;
+				border-radius: var(--dev-wallet-radius);
+				background: var(--dev-wallet-secondary);
 			}
 
 			.app-name {
-				font-size: 13px;
+				font-size: 14px;
 				font-weight: var(--dev-wallet-font-weight-medium);
 				color: var(--dev-wallet-foreground);
 				display: block;
 			}
 
 			.app-url {
-				font-size: 11px;
-				color: var(--dev-wallet-muted-foreground);
+				font-size: 12px;
+				color: var(--dev-wallet-tertiary);
 				word-break: break-all;
+				margin-top: 2px;
+				display: block;
 			}
 
 			.account-list {
-				max-height: 240px;
+				max-height: 280px;
 				overflow-y: auto;
 			}
 
 			.account-item {
 				display: flex;
 				align-items: center;
-				gap: 8px;
-				padding: 8px;
-				border-radius: var(--dev-wallet-radius-md);
+				gap: 12px;
+				padding: 14px 0;
+				border-bottom: 1px solid var(--dev-wallet-border);
 				cursor: pointer;
 			}
 
+			.account-item:last-child {
+				border-bottom: none;
+			}
+
 			.account-item:hover {
-				background: var(--dev-wallet-secondary);
+				background: transparent;
 			}
 
 			.account-item input[type='checkbox'] {
+				width: 18px;
+				height: 18px;
 				accent-color: var(--dev-wallet-primary);
+				flex-shrink: 0;
 			}
 
 			.account-label {
-				font-size: 13px;
-				font-weight: var(--dev-wallet-font-weight-semibold);
+				font-size: 14px;
+				font-weight: var(--dev-wallet-font-weight-medium);
 				color: var(--dev-wallet-foreground);
 			}
 
 			.account-address {
-				font-size: 11px;
+				font-size: 12px;
 				font-family: var(--dev-wallet-font-mono);
-				color: var(--dev-wallet-muted-foreground);
+				color: var(--dev-wallet-tertiary);
 			}
 
 			.account-adapter {
 				display: inline-block;
-				font-size: 9px;
-				font-weight: var(--dev-wallet-font-weight-semibold);
+				font-size: 10px;
+				font-weight: var(--dev-wallet-font-weight-medium);
 				text-transform: uppercase;
-				letter-spacing: 0.3px;
-				padding: 1px 5px;
-				border-radius: var(--dev-wallet-radius-2xs);
-				background: color-mix(in oklab, var(--dev-wallet-primary) 15%, transparent);
-				color: var(--dev-wallet-primary);
+				letter-spacing: 0.04em;
+				padding: 2px 8px;
+				border-radius: 999px;
+				background: rgba(255, 255, 255, 0.06);
+				color: var(--dev-wallet-tertiary);
 				margin-left: 6px;
 			}
 
 			.connect-footer {
-				padding: 12px 16px;
+				padding: 16px 20px;
 				border-top: 1px solid var(--dev-wallet-border);
 			}
 
-			/* Override: connect uses --primary instead of --positive for approve */
 			.btn-approve {
 				background: var(--dev-wallet-primary);
 			}
 
 			.btn-approve:hover {
-				background: oklab(from var(--dev-wallet-primary) calc(l - 0.03) a b);
+				filter: brightness(0.9);
 			}
 
 			.btn-approve:disabled {
@@ -133,7 +143,6 @@ export class DevWalletConnect extends LitElement {
 				color: var(--dev-wallet-destructive);
 				font-size: 12px;
 				margin-top: 8px;
-				text-align: center;
 			}
 		`,
 	];

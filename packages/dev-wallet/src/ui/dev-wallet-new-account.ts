@@ -44,16 +44,15 @@ export class DevWalletNewAccount extends LitElement {
 				max-height: min(420px, 80vh);
 				border-radius: var(--dev-wallet-radius-xl);
 				background: var(--dev-wallet-background);
-				border: 1px solid var(--dev-wallet-border);
 				box-shadow: var(--dev-wallet-shadow-lg);
-				padding: 20px;
+				padding: 24px;
 				display: flex;
 				flex-direction: column;
 				color: inherit;
 			}
 
 			dialog::backdrop {
-				background: color-mix(in oklab, oklch(0 0 0) 50%, transparent);
+				background: rgba(0, 0, 0, 0.5);
 			}
 
 			.dialog-title {
@@ -120,7 +119,7 @@ export class DevWalletNewAccount extends LitElement {
 
 			.field-input:focus {
 				border-color: var(--dev-wallet-primary);
-				outline: 2px solid color-mix(in oklab, var(--dev-wallet-ring) 50%, transparent);
+				outline: 2px solid rgba(0, 178, 255, 0.4);
 				outline-offset: -1px;
 			}
 
@@ -168,7 +167,7 @@ export class DevWalletNewAccount extends LitElement {
 			}
 
 			.select-option:hover {
-				background: color-mix(in oklab, var(--dev-wallet-primary) 15%, transparent);
+				background: rgba(0, 178, 255, 0.1);
 			}
 
 			.select-option.selected {
@@ -204,7 +203,7 @@ export class DevWalletNewAccount extends LitElement {
 
 			.import-item.selected {
 				border-color: var(--dev-wallet-primary);
-				background: color-mix(in oklab, var(--dev-wallet-primary) 10%, var(--dev-wallet-secondary));
+				background: rgba(0, 178, 255, 0.08);
 			}
 
 			.import-item:disabled {

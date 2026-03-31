@@ -28,7 +28,6 @@ export class DevWalletPopup extends LitElement {
 				max-height: min(600px, 80vh);
 				border-radius: var(--dev-wallet-radius-xl);
 				background: var(--dev-wallet-background);
-				border: 1px solid var(--dev-wallet-border);
 				box-shadow: var(--dev-wallet-shadow-lg);
 				overflow: hidden;
 				display: flex;
@@ -39,12 +38,12 @@ export class DevWalletPopup extends LitElement {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				padding: 14px 16px;
+				padding: 16px 20px;
 				border-bottom: 1px solid var(--dev-wallet-border);
 			}
 
 			.popup-title {
-				font-size: 15px;
+				font-size: 16px;
 				font-weight: var(--dev-wallet-font-weight-semibold);
 				color: var(--dev-wallet-foreground);
 			}

@@ -2,11 +2,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ClientWithCoreApi } from '@mysten/sui/client';
+import { getFaucetHost, requestSuiFromFaucetV2 } from '@mysten/sui/faucet';
 import type { ReadonlyWalletAccount } from '@mysten/wallet-standard';
 import { html, nothing } from 'lit';
 import type { ReactiveController, ReactiveControllerHost } from 'lit';
 
 import { getNetworkFromChain } from '../wallet/constants.js';
+import { CopyController } from './copy-controller.js';
+import { formatAddress } from './utils.js';
 import type {
 	DevWallet,
 	PendingConnectRequest,
@@ -39,10 +42,15 @@ export class WalletController implements ReactiveController {
 	pendingConnect: PendingConnectRequest | null = null;
 	bookmarkletOrigin = '';
 
+	faucetLoading = false;
+	faucetError: string | null = null;
+	showReceive = false;
+
 	#wallet: DevWallet | null = null;
 	#unsubscribeEvents: (() => void) | null = null;
 	#unsubscribeRequests: (() => void) | null = null;
 	#unsubscribeConnect: (() => void) | null = null;
+	#copy = new CopyController({ requestUpdate: () => this.host.requestUpdate() } as any);
 
 	constructor(host: ReactiveControllerHost) {
 		this.host = host;
@@ -201,8 +209,43 @@ export class WalletController implements ReactiveController {
 	}
 
 	renderAssetsTab() {
+		const canFaucet =
+			this.#wallet?.activeNetwork === 'testnet' || this.#wallet?.activeNetwork === 'devnet';
+
 		return html`
 			${this.renderAccountSelector()}
+			${this.activeAddress
+				? html`
+						<div class="address-bar">
+							<span class="address-text">${formatAddress(this.activeAddress)}</span>
+							<button
+								class="address-copy-btn ${this.#copy.isCopied(this.activeAddress) ? 'copied' : ''}"
+								title="Copy address"
+								aria-label="Copy address"
+								@click=${() => this.#copy.copy(this.activeAddress)}
+							>
+								${this.#copy.isCopied(this.activeAddress) ? '\u2713' : '\u2398'}
+							</button>
+						</div>
+						<div class="action-buttons">
+							${canFaucet
+								? html`<button
+										class="action-btn ${this.faucetLoading ? 'requesting' : ''}"
+										?disabled=${this.faucetLoading}
+										@click=${() => this.#handleFaucet()}
+									>
+										${this.faucetLoading ? 'Requesting...' : 'Faucet'}
+									</button>`
+								: nothing}
+							<button class="action-btn" @click=${() => this.#openReceive()}>Receive</button>
+							<button class="action-btn" disabled title="Coming soon">Send</button>
+						</div>
+						${this.faucetError
+							? html`<div class="action-error">${this.faucetError}</div>`
+							: nothing}
+					`
+				: nothing}
+			${this.showReceive ? this.#renderReceiveOverlay() : nothing}
 			${this.activeAddress && this.#wallet
 				? html`
 						<div class="section">
@@ -311,6 +354,64 @@ export class WalletController implements ReactiveController {
 				.active=${this.activeTab}
 				@tab-changed=${(e: CustomEvent) => this.handleTabChanged(e)}
 			></dev-wallet-tab-bar>
+		`;
+	}
+
+	// ── Action bar handlers ─────────────────────────────────────────────────
+
+	async #handleFaucet(): Promise<void> {
+		if (!this.#wallet || this.faucetLoading) return;
+
+		const network = this.#wallet.activeNetwork;
+		if (network !== 'testnet' && network !== 'devnet') return;
+
+		this.faucetLoading = true;
+		this.faucetError = null;
+		this.host.requestUpdate();
+
+		try {
+			await requestSuiFromFaucetV2({
+				host: getFaucetHost(network),
+				recipient: this.activeAddress,
+			});
+			// Refresh balances after faucet
+			const el = (this.host as unknown as HTMLElement).shadowRoot?.querySelector?.(
+				'dev-wallet-balances',
+			) as any;
+			el?.refresh?.();
+		} catch (err) {
+			this.faucetError = err instanceof Error ? err.message : 'Faucet request failed';
+		} finally {
+			this.faucetLoading = false;
+			this.host.requestUpdate();
+		}
+	}
+
+	#openReceive(): void {
+		this.showReceive = true;
+		this.host.requestUpdate();
+	}
+
+	#closeReceive(): void {
+		this.showReceive = false;
+		this.host.requestUpdate();
+	}
+
+	#renderReceiveOverlay() {
+		return html`
+			<div class="receive-overlay" @click=${() => this.#closeReceive()}>
+				<div class="receive-card" @click=${(e: Event) => e.stopPropagation()}>
+					<div class="receive-title">Receive</div>
+					<div class="receive-address">${this.activeAddress}</div>
+					<button
+						class="receive-copy-btn ${this.#copy.isCopied(this.activeAddress) ? 'copied' : ''}"
+						@click=${() => this.#copy.copy(this.activeAddress)}
+					>
+						${this.#copy.isCopied(this.activeAddress) ? 'Copied!' : 'Copy Address'}
+					</button>
+					<button class="receive-close" @click=${() => this.#closeReceive()}>Close</button>
+				</div>
+			</div>
 		`;
 	}
 

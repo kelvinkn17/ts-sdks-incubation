@@ -59,10 +59,10 @@ export async function copyToClipboard(text: string): Promise<boolean> {
 }
 
 export const NETWORK_COLORS: Record<string, string> = {
-	mainnet: '#f97316',
-	testnet: '#22c55e',
-	devnet: '#3b82f6',
-	localnet: '#6b7280',
+	mainnet: '#ff9905',
+	testnet: '#00bc7e',
+	devnet: '#00b2ff',
+	localnet: 'rgba(255, 255, 255, 0.3)',
 };
 
 export interface PairableAdapter {

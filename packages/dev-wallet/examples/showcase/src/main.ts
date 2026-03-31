@@ -1,12 +1,11 @@
 import { DevWallet } from '@mysten-incubation/dev-wallet';
 import { InMemorySignerAdapter } from '@mysten-incubation/dev-wallet/adapters';
 
-// Register all Lit custom elements
 import '@mysten-incubation/dev-wallet/ui';
 
 import type { DevWalletStandalone } from '@mysten-incubation/dev-wallet/ui';
 
-// -- Mock data for showcase --------------------------------------------------
+// -- Mock data ----------------------------------------------------------------
 
 const MOCK_ACCOUNTS = [
 	{
@@ -58,7 +57,7 @@ const MOCK_SIGNING_REQUEST = {
 	data: 'mock-tx-base64-data',
 };
 
-// -- Initialize wallet -------------------------------------------------------
+// -- Initialize wallet --------------------------------------------------------
 
 async function initWallet(): Promise<DevWallet> {
 	const adapter = new InMemorySignerAdapter();
@@ -73,7 +72,7 @@ async function initWallet(): Promise<DevWallet> {
 	});
 }
 
-// -- DOM helpers (no innerHTML to avoid XSS) ----------------------------------
+// -- DOM helpers (no innerHTML for XSS) ---------------------------------------
 
 function el(tag: string, attrs?: Record<string, string>): HTMLElement {
 	const e = document.createElement(tag);
@@ -88,12 +87,22 @@ function text(tag: string, content: string, className?: string): HTMLElement {
 	return e;
 }
 
-function createCard(title: string, subtitle: string, width = 380): HTMLElement {
+function createCard(
+	title: string,
+	tagName: string,
+	subtitle: string,
+	width?: number,
+): HTMLElement {
 	const card = el('div', { class: 'showcase-card' });
-	card.style.width = `${width}px`;
+	if (width) card.style.width = `${width}px`;
 
 	const header = el('div', { class: 'showcase-card-header' });
-	header.appendChild(text('div', title, 'showcase-card-title'));
+	const titleRow = el('div', { class: 'showcase-card-title-row' });
+	titleRow.appendChild(text('span', title, 'showcase-card-title'));
+	if (tagName) {
+		titleRow.appendChild(text('code', `<${tagName}>`, 'showcase-card-tag'));
+	}
+	header.appendChild(titleRow);
 	header.appendChild(text('div', subtitle, 'showcase-card-subtitle'));
 	card.appendChild(header);
 
@@ -107,11 +116,17 @@ function getBody(card: HTMLElement): HTMLElement {
 	return card.querySelector('.showcase-card-body')!;
 }
 
-function createSection(title: string, desc: string): HTMLElement {
-	const section = el('div', { class: 'showcase-section' });
-	section.appendChild(text('div', title, 'showcase-section-title'));
-	section.appendChild(text('div', desc, 'showcase-section-desc'));
+function createSection(id: string, title: string, desc: string): HTMLElement {
+	const section = el('div', { class: 'showcase-section', id });
+	section.appendChild(text('h2', title, 'showcase-section-title'));
+	section.appendChild(text('p', desc, 'showcase-section-desc'));
 	return section;
+}
+
+function createSubgroup(title: string): HTMLElement {
+	const group = el('div', { class: 'showcase-subgroup' });
+	group.appendChild(text('h3', title, 'showcase-subgroup-title'));
+	return group;
 }
 
 // -- Build showcase -----------------------------------------------------------
@@ -119,92 +134,178 @@ function createSection(title: string, desc: string): HTMLElement {
 async function buildShowcase() {
 	const app = document.getElementById('app')!;
 
-	// Page styles
 	const style = document.createElement('style');
 	style.textContent = `
 		* { margin: 0; padding: 0; box-sizing: border-box; }
 
 		body {
-			background: #0a0a0f;
-			color: #e2e8f0;
-			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+			background: #141414;
+			color: #f5f5f5;
+			font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 			min-height: 100vh;
+			letter-spacing: -0.01em;
 		}
 
 		#app {
-			max-width: 1600px;
+			max-width: 1400px;
 			margin: 0 auto;
-			padding: 32px 24px;
+			padding: 32px 24px 120px;
 		}
 
+		/* -- Header ----------------------------------------------------------- */
+
 		.showcase-header {
-			margin-bottom: 40px;
-			border-bottom: 1px solid #1e293b;
-			padding-bottom: 24px;
+			margin-bottom: 16px;
+			padding-bottom: 16px;
+			border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 		}
+
+		.showcase-header h1 {
+			font-size: 16px;
+			font-weight: 600;
+			color: #f5f5f5;
+			margin-bottom: 4px;
+		}
+
+		.showcase-header p {
+			font-size: 12px;
+			color: rgba(255, 255, 255, 0.4);
+		}
+
+		/* -- Sticky Nav ------------------------------------------------------- */
+
+		.showcase-nav {
+			position: sticky;
+			top: 0;
+			z-index: 100;
+			background: rgba(20, 20, 20, 0.9);
+			backdrop-filter: blur(12px);
+			border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+			padding: 10px 0;
+			margin-bottom: 32px;
+			display: flex;
+			gap: 2px;
+		}
+
+		.showcase-nav a {
+			color: rgba(255, 255, 255, 0.4);
+			text-decoration: none;
+			font-size: 12px;
+			font-weight: 500;
+			padding: 5px 12px;
+			border-radius: 6px;
+			transition: color 0.15s;
+		}
+
+		.showcase-nav a:hover {
+			color: #f5f5f5;
+		}
+
+		.showcase-nav a.active {
+			color: #f5f5f5;
+		}
+
+		/* -- Sections --------------------------------------------------------- */
 
 		.showcase-section {
 			margin-bottom: 48px;
+			scroll-margin-top: 60px;
 		}
 
 		.showcase-section-title {
-			font-size: 18px;
+			font-size: 15px;
 			font-weight: 600;
-			margin-bottom: 6px;
-			color: #f1f5f9;
+			color: #f5f5f5;
+			margin-bottom: 4px;
 		}
 
 		.showcase-section-desc {
-			font-size: 13px;
-			color: #64748b;
+			font-size: 12px;
+			color: rgba(255, 255, 255, 0.4);
 			margin-bottom: 20px;
 		}
+
+		/* -- Subgroups -------------------------------------------------------- */
+
+		.showcase-subgroup {
+			margin-bottom: 24px;
+		}
+
+		.showcase-subgroup-title {
+			font-size: 11px;
+			font-weight: 600;
+			color: rgba(255, 255, 255, 0.3);
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+			margin-bottom: 12px;
+		}
+
+		/* -- Grid ------------------------------------------------------------- */
 
 		.showcase-grid {
 			display: flex;
 			flex-wrap: wrap;
-			gap: 24px;
+			gap: 20px;
 			align-items: flex-start;
 		}
 
+		/* -- Cards ------------------------------------------------------------ */
+
 		.showcase-card {
-			background: #111118;
-			border: 1px solid #1e293b;
-			border-radius: 12px;
+			background: #1c1c1e;
+			border: 1px solid rgba(255, 255, 255, 0.06);
+			border-radius: 14px;
 			overflow: hidden;
 			flex-shrink: 0;
+			flex-grow: 0;
 		}
 
 		.showcase-card-header {
-			padding: 12px 16px;
-			border-bottom: 1px solid #1e293b;
-			background: #0d0d14;
+			padding: 10px 14px;
+			border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+		}
+
+		.showcase-card-title-row {
+			display: flex;
+			align-items: center;
+			gap: 8px;
 		}
 
 		.showcase-card-title {
-			font-size: 13px;
-			font-weight: 600;
-			color: #94a3b8;
+			font-size: 12px;
+			font-weight: 500;
+			color: rgba(255, 255, 255, 0.5);
+		}
+
+		.showcase-card-tag {
+			font-size: 10px;
+			color: rgba(255, 255, 255, 0.25);
+			font-family: 'SF Mono', 'Fira Code', monospace;
+			background: rgba(255, 255, 255, 0.04);
+			padding: 2px 6px;
+			border-radius: 4px;
 		}
 
 		.showcase-card-subtitle {
 			font-size: 11px;
-			color: #475569;
+			color: rgba(255, 255, 255, 0.25);
 			margin-top: 2px;
 		}
 
 		.showcase-card-body {
 			position: relative;
-			min-height: 100px;
+			min-height: 80px;
 		}
 
+		/* -- Standalone wallet container -------------------------------------- */
+
 		.standalone-container {
-			height: 580px;
+			height: 560px;
 			overflow: hidden;
 		}
 
 		.standalone-container dev-wallet-standalone {
-			--dev-wallet-background: #111118;
+			--dev-wallet-background: #1c1c1e;
 		}
 	`;
 	document.head.appendChild(style);
@@ -212,184 +313,166 @@ async function buildShowcase() {
 	const wallet = await initWallet();
 	const accounts = wallet.accounts;
 
-	// Page header
+	// -- Header ---------------------------------------------------------------
+
 	const header = el('div', { class: 'showcase-header' });
-	header.appendChild(text('h1', 'Dev Wallet UI Showcase'));
+	header.appendChild(text('h1', 'Dev Wallet Showcase'));
 	header.appendChild(
 		text(
 			'p',
-			`All component states rendered side by side for redesign reference. ${accounts.length} accounts loaded on testnet.`,
+			`${accounts.length} accounts on testnet. Component reference for development.`,
 		),
 	);
 	app.appendChild(header);
 
-	// ── Section 1: Standalone wallet (all tabs) ─────────────────────────────
-	const section1 = createSection(
-		'Standalone Wallet Views',
-		'The main wallet card in all three tab states.',
+	// -- Sticky Nav ------------------------------------------------------------
+
+	const nav = el('nav', { class: 'showcase-nav' });
+	const sections = [
+		{ id: 'wallet', label: 'Wallet' },
+		{ id: 'flows', label: 'Flows' },
+		{ id: 'components', label: 'Components' },
+	];
+	sections.forEach(({ id, label }) => {
+		const a = el('a', { href: `#${id}` });
+		a.textContent = label;
+		nav.appendChild(a);
+	});
+	app.appendChild(nav);
+
+	// Scroll spy: highlight active nav link
+	const observer = new IntersectionObserver(
+		(entries) => {
+			entries.forEach((entry) => {
+				const link = nav.querySelector(`a[href="#${entry.target.id}"]`);
+				if (entry.isIntersecting) {
+					nav.querySelectorAll('a').forEach((a) => a.classList.remove('active'));
+					link?.classList.add('active');
+				}
+			});
+		},
+		{ rootMargin: '-80px 0px -60% 0px' },
 	);
+
+	// -- Section 1: Interactive Wallet ----------------------------------------
+
+	const s1 = createSection(
+		'wallet',
+		'Interactive Wallet',
+		'Fully functional standalone wallet. Switch tabs, select accounts, change networks.',
+	);
+	observer.observe(s1);
+
+	const walletCard = createCard(
+		'Standalone Wallet',
+		'dev-wallet-standalone',
+		'Full wallet with all tabs. Click through to explore.',
+		400,
+	);
+	const walletContainer = el('div', { class: 'standalone-container' });
+	const standaloneWallet = document.createElement('dev-wallet-standalone') as DevWalletStandalone;
+	standaloneWallet.wallet = wallet;
+	walletContainer.appendChild(standaloneWallet);
+	getBody(walletCard).appendChild(walletContainer);
 
 	const grid1 = el('div', { class: 'showcase-grid' });
+	grid1.appendChild(walletCard);
+	s1.appendChild(grid1);
+	app.appendChild(s1);
 
-	// Assets tab
-	const assetsCard = createCard('Assets Tab', 'Balances view with account selector', 420);
-	const assetsContainer = el('div', { class: 'standalone-container' });
-	const assetsWallet = document.createElement('dev-wallet-standalone') as DevWalletStandalone;
-	assetsWallet.wallet = wallet;
-	assetsContainer.appendChild(assetsWallet);
-	getBody(assetsCard).appendChild(assetsContainer);
-	grid1.appendChild(assetsCard);
+	// -- Section 2: Integration Flows -----------------------------------------
 
-	// Objects tab
-	const objectsCard = createCard('Objects Tab', 'Owned objects view', 420);
-	const objectsContainer = el('div', { class: 'standalone-container' });
-	const objectsWallet = document.createElement('dev-wallet-standalone') as DevWalletStandalone;
-	objectsWallet.wallet = wallet;
-	objectsContainer.appendChild(objectsWallet);
-	getBody(objectsCard).appendChild(objectsContainer);
-	grid1.appendChild(objectsCard);
-
-	// Settings tab
-	const settingsCard = createCard('Settings Tab', 'Networks, accounts, and config', 420);
-	const settingsContainer = el('div', { class: 'standalone-container' });
-	const settingsWallet = document.createElement(
-		'dev-wallet-standalone',
-	) as DevWalletStandalone;
-	settingsWallet.wallet = wallet;
-	settingsContainer.appendChild(settingsWallet);
-	getBody(settingsCard).appendChild(settingsContainer);
-	grid1.appendChild(settingsCard);
-
-	section1.appendChild(grid1);
-	app.appendChild(section1);
-
-	// Switch tabs after components mount
-	requestAnimationFrame(() => {
-		setTimeout(() => {
-			const objectsTabBar = objectsWallet.shadowRoot?.querySelector('dev-wallet-tab-bar');
-			if (objectsTabBar) {
-				objectsTabBar.dispatchEvent(
-					new CustomEvent('tab-changed', {
-						detail: { tab: 'objects' },
-						bubbles: true,
-						composed: true,
-					}),
-				);
-			}
-
-			const settingsTabBar =
-				settingsWallet.shadowRoot?.querySelector('dev-wallet-tab-bar');
-			if (settingsTabBar) {
-				settingsTabBar.dispatchEvent(
-					new CustomEvent('tab-changed', {
-						detail: { tab: 'settings' },
-						bubbles: true,
-						composed: true,
-					}),
-				);
-			}
-		}, 200);
-	});
-
-	// ── Section 2: Signing Flow ─────────────────────────────────────────────
-	const section2 = createSection(
-		'Signing Flow',
-		'Transaction approval, message signing, and error states.',
+	const s2 = createSection(
+		'flows',
+		'Integration Flows',
+		'The dialogs dApps trigger: connection requests and signing approval.',
 	);
+	observer.observe(s2);
 
-	const grid2 = el('div', { class: 'showcase-grid' });
+	// Connection subgroup
+	const connGroup = createSubgroup('Connection');
+	const connGrid = el('div', { class: 'showcase-grid' });
 
-	// Signing: message
-	const signingMsgCard = createCard('Sign Personal Message', 'Message approval request', 380);
+	const connectCard = createCard(
+		'With App Info',
+		'dev-wallet-connect',
+		'App name + URL shown to user',
+		380,
+	);
+	const connect = document.createElement('dev-wallet-connect') as any;
+	connect.appName = 'Cetus DEX';
+	connect.appUrl = 'https://app.cetus.zone';
+	connect.accounts = MOCK_ACCOUNTS;
+	getBody(connectCard).appendChild(connect);
+	connGrid.appendChild(connectCard);
+
+	const connectMinCard = createCard(
+		'Minimal',
+		'dev-wallet-connect',
+		'No app metadata provided',
+		380,
+	);
+	const connectMin = document.createElement('dev-wallet-connect') as any;
+	connectMin.accounts = MOCK_ACCOUNTS.slice(0, 1);
+	getBody(connectMinCard).appendChild(connectMin);
+	connGrid.appendChild(connectMinCard);
+
+	connGroup.appendChild(connGrid);
+	s2.appendChild(connGroup);
+
+	// Signing subgroup
+	const signGroup = createSubgroup('Signing');
+	const signGrid = el('div', { class: 'showcase-grid' });
+
+	const msgCard = createCard(
+		'Personal Message',
+		'dev-wallet-signing',
+		'Message signing approval',
+		380,
+	);
 	const signingMsg = document.createElement('dev-wallet-signing') as any;
 	signingMsg.request = MOCK_MESSAGE_REQUEST;
 	signingMsg.client = null;
 	signingMsg.style.height = '380px';
-	getBody(signingMsgCard).appendChild(signingMsg);
-	grid2.appendChild(signingMsgCard);
+	getBody(msgCard).appendChild(signingMsg);
+	signGrid.appendChild(msgCard);
 
-	// Signing: no request
-	const signingEmptyCard = createCard('No Pending Request', 'Empty state when idle', 380);
-	const signingEmpty = document.createElement('dev-wallet-signing') as any;
-	signingEmpty.request = null;
-	signingEmpty.client = null;
-	signingEmpty.style.height = '200px';
-	getBody(signingEmptyCard).appendChild(signingEmpty);
-	grid2.appendChild(signingEmptyCard);
-
-	// Signing: transaction (will show analyzing / error since mock data)
-	const signingTxCard = createCard(
-		'Sign Transaction',
-		'Transaction with analysis (analyzing state)',
+	const txCard = createCard(
+		'Transaction',
+		'dev-wallet-signing',
+		'Transaction signing with analysis',
 		380,
 	);
 	const signingTx = document.createElement('dev-wallet-signing') as any;
 	signingTx.request = MOCK_SIGNING_REQUEST;
 	signingTx.client = null;
 	signingTx.style.height = '380px';
-	getBody(signingTxCard).appendChild(signingTx);
-	grid2.appendChild(signingTxCard);
+	getBody(txCard).appendChild(signingTx);
+	signGrid.appendChild(txCard);
 
-	section2.appendChild(grid2);
-	app.appendChild(section2);
+	signGroup.appendChild(signGrid);
+	s2.appendChild(signGroup);
+	app.appendChild(s2);
 
-	// ── Section 3: Connect dialog ───────────────────────────────────────────
-	const section3 = createSection(
-		'Connection Flow',
-		'Account selection when a dApp requests to connect.',
+	// -- Section 3: Component Reference ---------------------------------------
+
+	const s3 = createSection(
+		'components',
+		'Component Reference',
+		'Individual building blocks. Each shown with its custom element tag.',
 	);
+	observer.observe(s3);
 
-	const grid3 = el('div', { class: 'showcase-grid' });
+	// Controls subgroup
+	const controlsGroup = createSubgroup('Controls');
+	const controlsGrid = el('div', { class: 'showcase-grid' });
 
-	// Connect: with app info
-	const connectCard = createCard('Connect with App Info', 'Shows app name and URL', 380);
-	const connect = document.createElement('dev-wallet-connect') as any;
-	connect.appName = 'Cetus DEX';
-	connect.appUrl = 'https://app.cetus.zone';
-	connect.accounts = MOCK_ACCOUNTS;
-	getBody(connectCard).appendChild(connect);
-	grid3.appendChild(connectCard);
-
-	// Connect: no app info
-	const connectPlainCard = createCard('Connect (minimal)', 'No app info provided', 380);
-	const connectPlain = document.createElement('dev-wallet-connect') as any;
-	connectPlain.accounts = MOCK_ACCOUNTS.slice(0, 1);
-	getBody(connectPlainCard).appendChild(connectPlain);
-	grid3.appendChild(connectPlainCard);
-
-	section3.appendChild(grid3);
-	app.appendChild(section3);
-
-	// ── Section 4: Sub-components ───────────────────────────────────────────
-	const section4 = createSection(
-		'Sub Components',
-		'Individual pieces: balances, objects, account selector, network badge, tab bar.',
+	const selectorCard = createCard(
+		'Account Selector',
+		'dev-wallet-account-selector',
+		'Switch between accounts',
+		380,
 	);
-
-	const grid4 = el('div', { class: 'showcase-grid' });
-
-	// Balances
-	const balancesCard = createCard('Balances', 'Fetches from testnet RPC', 380);
-	const balances = document.createElement('dev-wallet-balances') as any;
-	balances.address = accounts[0]?.address ?? '';
-	balances.client = wallet.activeClient;
-	balances.style.display = 'block';
-	balances.style.padding = '16px';
-	getBody(balancesCard).appendChild(balances);
-	grid4.appendChild(balancesCard);
-
-	// Objects
-	const objectsSubCard = createCard('Objects', 'Fetches owned objects from testnet', 380);
-	const objectsSub = document.createElement('dev-wallet-objects') as any;
-	objectsSub.address = accounts[0]?.address ?? '';
-	objectsSub.client = wallet.activeClient;
-	objectsSub.style.display = 'block';
-	objectsSub.style.padding = '16px';
-	getBody(objectsSubCard).appendChild(objectsSub);
-	grid4.appendChild(objectsSubCard);
-
-	// Account selector
-	const selectorCard = createCard('Account Selector', 'Dropdown for switching accounts', 380);
 	const selector = document.createElement('dev-wallet-account-selector') as any;
 	selector.accounts = accounts;
 	selector.adapters = [...wallet.adapters];
@@ -397,45 +480,81 @@ async function buildShowcase() {
 	selector.style.display = 'block';
 	selector.style.padding = '16px';
 	getBody(selectorCard).appendChild(selector);
-	grid4.appendChild(selectorCard);
+	controlsGrid.appendChild(selectorCard);
 
-	// Network badge
-	const badgeCard = createCard('Network Badge', 'Network selector dropdown', 380);
+	const badgeCard = createCard(
+		'Network Badge',
+		'dev-wallet-network-badge',
+		'Network selector dropdown',
+		280,
+	);
 	const badge = document.createElement('dev-wallet-network-badge') as any;
 	badge.active = 'testnet';
 	badge.networks = ['devnet', 'testnet', 'localnet'];
 	badge.style.display = 'block';
 	badge.style.padding = '16px';
 	getBody(badgeCard).appendChild(badge);
-	grid4.appendChild(badgeCard);
+	controlsGrid.appendChild(badgeCard);
 
-	// Tab bar (assets active)
-	const tabCard = createCard('Tab Bar', 'Navigation between wallet sections', 380);
+	const tabCard = createCard(
+		'Tab Bar',
+		'dev-wallet-tab-bar',
+		'Section navigation',
+		380,
+	);
 	const tabBar = document.createElement('dev-wallet-tab-bar') as any;
 	tabBar.active = 'assets';
 	getBody(tabCard).appendChild(tabBar);
-	grid4.appendChild(tabCard);
+	controlsGrid.appendChild(tabCard);
 
-	// Tab bar (objects active)
-	const tabCard2 = createCard('Tab Bar (Objects)', 'With objects tab active', 380);
-	const tabBar2 = document.createElement('dev-wallet-tab-bar') as any;
-	tabBar2.active = 'objects';
-	getBody(tabCard2).appendChild(tabBar2);
-	grid4.appendChild(tabCard2);
+	controlsGroup.appendChild(controlsGrid);
+	s3.appendChild(controlsGroup);
 
-	section4.appendChild(grid4);
-	app.appendChild(section4);
+	// Data Display subgroup
+	const dataGroup = createSubgroup('Data Display');
+	const dataGrid = el('div', { class: 'showcase-grid' });
 
-	// ── Section 5: Account management ───────────────────────────────────────
-	const section5 = createSection(
-		'Account Management',
-		'Account list, creation, and management UI.',
+	const balancesCard = createCard(
+		'Balances',
+		'dev-wallet-balances',
+		'Coin balances from RPC',
+		380,
 	);
+	const balances = document.createElement('dev-wallet-balances') as any;
+	balances.address = accounts[0]?.address ?? '';
+	balances.client = wallet.activeClient;
+	balances.style.display = 'block';
+	balances.style.padding = '16px';
+	getBody(balancesCard).appendChild(balances);
+	dataGrid.appendChild(balancesCard);
 
-	const grid5 = el('div', { class: 'showcase-grid' });
+	const objectsCard = createCard(
+		'Objects',
+		'dev-wallet-objects',
+		'Owned objects from RPC',
+		380,
+	);
+	const objectsSub = document.createElement('dev-wallet-objects') as any;
+	objectsSub.address = accounts[0]?.address ?? '';
+	objectsSub.client = wallet.activeClient;
+	objectsSub.style.display = 'block';
+	objectsSub.style.padding = '16px';
+	getBody(objectsCard).appendChild(objectsSub);
+	dataGrid.appendChild(objectsCard);
 
-	// Accounts list
-	const accountsCard = createCard('Accounts List', 'All accounts with edit/delete', 420);
+	dataGroup.appendChild(dataGrid);
+	s3.appendChild(dataGroup);
+
+	// Management subgroup
+	const mgmtGroup = createSubgroup('Management');
+	const mgmtGrid = el('div', { class: 'showcase-grid' });
+
+	const accountsCard = createCard(
+		'Account List',
+		'dev-wallet-accounts',
+		'CRUD operations on accounts',
+		420,
+	);
 	const accountsList = document.createElement('dev-wallet-accounts') as any;
 	accountsList.accounts = accounts;
 	accountsList.adapters = [...wallet.adapters];
@@ -443,10 +562,14 @@ async function buildShowcase() {
 	accountsList.style.display = 'block';
 	accountsList.style.padding = '16px';
 	getBody(accountsCard).appendChild(accountsList);
-	grid5.appendChild(accountsCard);
+	mgmtGrid.appendChild(accountsCard);
 
-	// Settings
-	const settingsSubCard = createCard('Settings Panel', 'Networks + accounts + about', 420);
+	const settingsCard = createCard(
+		'Settings',
+		'dev-wallet-settings',
+		'Networks, accounts, bookmarklet, about',
+		420,
+	);
 	const settings = document.createElement('dev-wallet-settings') as any;
 	settings.wallet = wallet;
 	settings.accounts = accounts;
@@ -456,32 +579,19 @@ async function buildShowcase() {
 	settings.style.padding = '16px';
 	settings.style.maxHeight = '500px';
 	settings.style.overflowY = 'auto';
-	getBody(settingsSubCard).appendChild(settings);
-	grid5.appendChild(settingsSubCard);
+	getBody(settingsCard).appendChild(settings);
+	mgmtGrid.appendChild(settingsCard);
 
-	section5.appendChild(grid5);
-	app.appendChild(section5);
+	mgmtGroup.appendChild(mgmtGrid);
+	s3.appendChild(mgmtGroup);
 
-	// ── Section 6: FAB ──────────────────────────────────────────────────────
-	const section6 = createSection(
-		'Panel Trigger (FAB)',
-		'The floating action button. Shown here in static position for reference.',
-	);
+	app.appendChild(s3);
 
-	const grid6 = el('div', { class: 'showcase-grid' });
+	// -- Live FAB (actual floating button, not in a card) ---------------------
 
-	const fabCard = createCard('FAB Button', 'Click to open the panel', 200);
 	const panel = document.createElement('dev-wallet-panel') as any;
 	panel.wallet = wallet;
-	panel.style.display = 'flex';
-	panel.style.justifyContent = 'center';
-	panel.style.padding = '24px';
-	panel.style.position = 'relative';
-	getBody(fabCard).appendChild(panel);
-	grid6.appendChild(fabCard);
-
-	section6.appendChild(grid6);
-	app.appendChild(section6);
+	document.body.appendChild(panel);
 }
 
 buildShowcase().catch(console.error);

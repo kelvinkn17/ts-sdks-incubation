@@ -29,29 +29,31 @@ export class DevWalletBalances extends LitElement {
 			.balance-list {
 				display: flex;
 				flex-direction: column;
-				gap: 4px;
 			}
 
 			.balance-item {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				padding: 10px 12px;
-				border-radius: var(--dev-wallet-radius-sm);
-				border: 1px solid var(--dev-wallet-border);
-				background: var(--dev-wallet-secondary);
+				padding: 12px 0;
+				border-bottom: 1px solid var(--dev-wallet-border);
+			}
+
+			.balance-item:last-child {
+				border-bottom: none;
 			}
 
 			.balance-symbol {
-				font-size: 14px;
+				font-size: 13px;
 				font-weight: var(--dev-wallet-font-weight-medium);
 				color: var(--dev-wallet-foreground);
 			}
 
 			.balance-amount {
-				font-size: 14px;
-				color: var(--dev-wallet-foreground);
+				font-size: 13px;
+				color: var(--dev-wallet-muted-foreground);
 				font-family: var(--dev-wallet-font-mono);
+				font-variant-numeric: tabular-nums;
 			}
 		`,
 	];

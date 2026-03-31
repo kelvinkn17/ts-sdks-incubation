@@ -20,7 +20,7 @@ export class DevWalletTabBar extends LitElement {
 
 			.tab-bar {
 				display: flex;
-				height: 40px;
+				height: 44px;
 			}
 
 			.tab {
@@ -28,26 +28,24 @@ export class DevWalletTabBar extends LitElement {
 				display: flex;
 				align-items: center;
 				justify-content: center;
-				gap: 4px;
+				gap: 5px;
 				font-size: 11px;
 				font-weight: var(--dev-wallet-font-weight-medium);
-				color: var(--dev-wallet-muted-foreground);
+				color: var(--dev-wallet-tertiary);
 				transition: color 0.15s;
-				border-top: 2px solid transparent;
 			}
 
 			.tab:hover {
-				color: var(--dev-wallet-foreground);
+				color: var(--dev-wallet-muted-foreground);
 			}
 
 			.tab[aria-selected='true'] {
-				color: var(--dev-wallet-primary);
-				border-top-color: var(--dev-wallet-primary);
+				color: var(--dev-wallet-foreground);
 			}
 
 			.tab svg {
-				width: 16px;
-				height: 16px;
+				width: 15px;
+				height: 15px;
 			}
 		`,
 	];

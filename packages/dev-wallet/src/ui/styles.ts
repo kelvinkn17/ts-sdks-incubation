@@ -20,7 +20,7 @@ const resetStyles = css`
 		padding: 0;
 		margin: 0;
 		cursor: pointer;
-		outline-color: color-mix(in oklab, var(--dev-wallet-ring) 50%, transparent);
+		outline-color: rgba(0, 178, 255, 0.4);
 	}
 
 	p,
@@ -39,44 +39,46 @@ const resetStyles = css`
 
 const themeStyles = css`
 	:host {
-		/* Colors — OKLch dark theme */
-		--dev-wallet-background: oklch(0.175 0.028 283);
-		--dev-wallet-foreground: oklch(0.91 0 0);
-		--dev-wallet-primary: oklch(0.55 0.24 265);
-		--dev-wallet-primary-foreground: oklch(0.98 0 0);
-		--dev-wallet-secondary: oklch(0.195 0.04 262);
-		--dev-wallet-secondary-foreground: oklch(0.91 0 0);
-		--dev-wallet-muted: oklch(0.25 0.035 280);
-		--dev-wallet-muted-foreground: oklch(0.62 0.04 280);
-		--dev-wallet-destructive: oklch(0.63 0.26 25);
-		--dev-wallet-positive: oklch(0.72 0.19 145);
-		--dev-wallet-warning: oklch(0.79 0.17 75);
-		--dev-wallet-border: oklch(0.25 0.035 280);
-		--dev-wallet-input: oklch(0.25 0.035 280);
-		--dev-wallet-ring: oklch(0.55 0.24 265);
-		--dev-wallet-status-connected: #22c55e;
-		--dev-wallet-status-disconnected: #6b7280;
+		/* Colors: neutral dark, no tinting */
+		--dev-wallet-background: #1c1c1e;
+		--dev-wallet-foreground: #f5f5f5;
+		--dev-wallet-primary: #00b2ff;
+		--dev-wallet-primary-foreground: #ffffff;
+		--dev-wallet-secondary: #2c2c2e;
+		--dev-wallet-secondary-foreground: #f5f5f5;
+		--dev-wallet-muted: #2c2c2e;
+		--dev-wallet-muted-foreground: rgba(255, 255, 255, 0.5);
+		--dev-wallet-tertiary: rgba(255, 255, 255, 0.3);
+		--dev-wallet-destructive: #ff2b3a;
+		--dev-wallet-positive: #00bc7e;
+		--dev-wallet-warning: #ff9905;
+		--dev-wallet-border: rgba(255, 255, 255, 0.08);
+		--dev-wallet-border-med: rgba(255, 255, 255, 0.1);
+		--dev-wallet-input: rgba(255, 255, 255, 0.08);
+		--dev-wallet-ring: #00b2ff;
+		--dev-wallet-status-connected: #00bc7e;
+		--dev-wallet-status-disconnected: rgba(255, 255, 255, 0.3);
 
-		/* Radius scale — derived from base */
+		/* Radius */
 		--dev-wallet-radius: 12px;
-		--dev-wallet-radius-xs: calc(var(--dev-wallet-radius) - 6px);
-		--dev-wallet-radius-sm: calc(var(--dev-wallet-radius) - 4px);
-		--dev-wallet-radius-md: calc(var(--dev-wallet-radius) - 2px);
-		--dev-wallet-radius-xl: calc(var(--dev-wallet-radius) + 4px);
+		--dev-wallet-radius-xs: 6px;
+		--dev-wallet-radius-sm: 8px;
+		--dev-wallet-radius-md: 10px;
+		--dev-wallet-radius-xl: 16px;
 		--dev-wallet-radius-2xs: 3px;
 
 		/* Shadows */
-		--dev-wallet-shadow-sm: 0 1px 3px color-mix(in oklab, oklch(0 0 0) 10%, transparent);
-		--dev-wallet-shadow-md: 0 4px 12px color-mix(in oklab, oklch(0 0 0) 30%, transparent);
+		--dev-wallet-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+		--dev-wallet-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+		--dev-wallet-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.28),
+			0 0 0 1px rgba(255, 255, 255, 0.05);
 
 		/* Typography */
-		--dev-wallet-font-sans:
-			ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-			'Helvetica Neue', Arial, sans-serif;
+		--dev-wallet-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+			Helvetica, Arial, sans-serif;
 		--dev-wallet-font-weight-medium: 500;
 		--dev-wallet-font-weight-semibold: 600;
-		--dev-wallet-font-mono:
-			ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+		--dev-wallet-font-mono: 'SF Mono', 'Fira Code', 'Fira Mono', Menlo, Consolas, monospace;
 
 		/* Font-size scale */
 		--dev-wallet-text-2xs: 10px;
@@ -86,7 +88,8 @@ const themeStyles = css`
 		--dev-wallet-text-md: 14px;
 		--dev-wallet-text-lg: 15px;
 		--dev-wallet-text-xl: 16px;
-		--dev-wallet-shadow-lg: 0 8px 32px color-mix(in oklab, oklch(0 0 0) 40%, transparent);
+
+		letter-spacing: -0.01em;
 	}
 `;
 
@@ -100,14 +103,16 @@ export const dropdownItemStyles = css`
 		font-size: 12px;
 		color: var(--dev-wallet-foreground);
 		text-align: left;
+		border-radius: var(--dev-wallet-radius-sm);
 	}
 
 	.dropdown-item:hover {
-		background: var(--dev-wallet-secondary);
+		background: rgba(255, 255, 255, 0.06);
 	}
 
 	.dropdown-item[aria-selected='true'] {
-		font-weight: var(--dev-wallet-font-weight-semibold);
+		font-weight: var(--dev-wallet-font-weight-medium);
+		color: var(--dev-wallet-foreground);
 	}
 `;
 
@@ -117,7 +122,6 @@ export const connectDialogStyles = css`
 		max-height: min(600px, 80vh);
 		border-radius: var(--dev-wallet-radius-xl);
 		background: var(--dev-wallet-background);
-		border: 1px solid var(--dev-wallet-border);
 		box-shadow: var(--dev-wallet-shadow-lg);
 		overflow: hidden;
 		display: flex;
@@ -127,20 +131,161 @@ export const connectDialogStyles = css`
 	}
 
 	.connect-dialog::backdrop {
-		background: color-mix(in oklab, oklch(0 0 0) 50%, transparent);
+		background: rgba(0, 0, 0, 0.5);
 	}
 
 	.connect-dialog-header {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		padding: 14px 16px;
+		padding: 16px 20px;
 		border-bottom: 1px solid var(--dev-wallet-border);
 	}
 
 	.connect-dialog-title {
-		font-size: 15px;
+		font-size: 16px;
 		font-weight: var(--dev-wallet-font-weight-semibold);
+		color: var(--dev-wallet-foreground);
+	}
+`;
+
+export const actionBarStyles = css`
+	.address-bar {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 6px;
+		padding: 8px 0 4px;
+	}
+
+	.address-text {
+		font-size: 12px;
+		font-family: var(--dev-wallet-font-mono);
+		color: var(--dev-wallet-tertiary);
+	}
+
+	.address-copy-btn {
+		width: 24px;
+		height: 24px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: var(--dev-wallet-radius-xs);
+		font-size: 13px;
+		color: var(--dev-wallet-tertiary);
+	}
+
+	.address-copy-btn:hover {
+		color: var(--dev-wallet-foreground);
+	}
+
+	.address-copy-btn.copied {
+		color: var(--dev-wallet-positive);
+	}
+
+	.action-buttons {
+		display: flex;
+		justify-content: center;
+		gap: 8px;
+		padding: 12px 0 20px;
+	}
+
+	.action-btn {
+		padding: 8px 22px;
+		border-radius: 999px;
+		font-size: 13px;
+		font-weight: var(--dev-wallet-font-weight-medium);
+		color: var(--dev-wallet-foreground);
+		background: rgba(255, 255, 255, 0.08);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		transition: background 0.15s;
+	}
+
+	.action-btn:hover {
+		background: rgba(255, 255, 255, 0.12);
+	}
+
+	.action-btn:disabled {
+		opacity: 0.3;
+		cursor: not-allowed;
+	}
+
+	.action-btn.requesting {
+		opacity: 0.6;
+	}
+
+	.action-error {
+		text-align: center;
+		font-size: 12px;
+		color: var(--dev-wallet-destructive);
+		padding: 0 0 8px;
+	}
+
+	/* -- Receive dialog ---------------------------------------------------- */
+
+	.receive-overlay {
+		position: fixed;
+		inset: 0;
+		z-index: 100;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: rgba(0, 0, 0, 0.5);
+	}
+
+	.receive-card {
+		width: 300px;
+		padding: 24px;
+		border-radius: var(--dev-wallet-radius-xl);
+		background: var(--dev-wallet-background);
+		box-shadow: var(--dev-wallet-shadow-lg);
+		text-align: center;
+	}
+
+	.receive-title {
+		font-size: 16px;
+		font-weight: var(--dev-wallet-font-weight-semibold);
+		color: var(--dev-wallet-foreground);
+		margin-bottom: 16px;
+	}
+
+	.receive-address {
+		font-size: 12px;
+		font-family: var(--dev-wallet-font-mono);
+		color: var(--dev-wallet-muted-foreground);
+		word-break: break-all;
+		line-height: 1.6;
+		padding: 14px 16px;
+		border-radius: var(--dev-wallet-radius);
+		background: var(--dev-wallet-secondary);
+		margin-bottom: 16px;
+	}
+
+	.receive-copy-btn {
+		padding: 10px 24px;
+		border-radius: 999px;
+		font-size: 13px;
+		font-weight: var(--dev-wallet-font-weight-medium);
+		color: var(--dev-wallet-primary-foreground);
+		background: var(--dev-wallet-primary);
+	}
+
+	.receive-copy-btn:hover {
+		filter: brightness(0.9);
+	}
+
+	.receive-copy-btn.copied {
+		background: var(--dev-wallet-positive);
+	}
+
+	.receive-close {
+		display: block;
+		margin-top: 12px;
+		font-size: 13px;
+		color: var(--dev-wallet-muted-foreground);
+	}
+
+	.receive-close:hover {
 		color: var(--dev-wallet-foreground);
 	}
 `;
@@ -161,40 +306,45 @@ export const actionButtonStyles = css`
 	}
 
 	.btn-approve {
-		background: var(--dev-wallet-positive);
+		background: var(--dev-wallet-primary);
 		color: var(--dev-wallet-primary-foreground);
+		border-radius: 999px;
 	}
 
 	.btn-approve:hover {
-		background: oklab(from var(--dev-wallet-positive) calc(l - 0.03) a b);
+		filter: brightness(0.9);
 	}
 
 	.btn-reject {
 		background: var(--dev-wallet-destructive);
 		color: var(--dev-wallet-primary-foreground);
+		border-radius: 999px;
 	}
 
 	.btn-reject:hover {
-		background: oklab(from var(--dev-wallet-destructive) calc(l - 0.05) a b);
+		filter: brightness(0.9);
 	}
 
 	.btn-cancel {
-		background: var(--dev-wallet-secondary);
-		color: var(--dev-wallet-foreground);
-		border: 1px solid var(--dev-wallet-border);
+		background: transparent;
+		color: var(--dev-wallet-muted-foreground);
+		border: 1px solid var(--dev-wallet-border-med);
+		border-radius: 999px;
 	}
 
 	.btn-cancel:hover {
-		background: oklab(from var(--dev-wallet-secondary) calc(l - 0.02) a b);
+		color: var(--dev-wallet-foreground);
+		border-color: rgba(255, 255, 255, 0.2);
 	}
 
 	.btn-create {
 		background: var(--dev-wallet-primary);
 		color: var(--dev-wallet-primary-foreground);
+		border-radius: 999px;
 	}
 
 	.btn-create:hover {
-		background: oklab(from var(--dev-wallet-primary) calc(l - 0.03) a b);
+		filter: brightness(0.9);
 	}
 
 	.btn-create:disabled,
@@ -209,16 +359,16 @@ export const stateStyles = css`
 	.empty-state,
 	.error-state {
 		text-align: center;
-		padding: 16px;
+		padding: 32px 16px;
 		font-size: 13px;
 	}
 
 	.loading {
-		color: var(--dev-wallet-muted-foreground);
+		color: var(--dev-wallet-tertiary);
 	}
 
 	.empty-state {
-		color: var(--dev-wallet-muted-foreground);
+		color: var(--dev-wallet-tertiary);
 	}
 
 	.error-state {
@@ -228,12 +378,12 @@ export const stateStyles = css`
 
 export const sectionHeaderStyles = css`
 	.section-header {
-		font-size: 13px;
+		font-size: 12px;
 		font-weight: var(--dev-wallet-font-weight-semibold);
 		color: var(--dev-wallet-muted-foreground);
 		text-transform: uppercase;
-		letter-spacing: 0.5px;
-		margin-bottom: 12px;
+		letter-spacing: 0.05em;
+		margin-bottom: 8px;
 	}
 `;
 

@@ -29,3 +29,4 @@ packages/*/docs/
 # Generated fumadocs source files
 .source/
 .vercel
+.claude/contribution-findings.md

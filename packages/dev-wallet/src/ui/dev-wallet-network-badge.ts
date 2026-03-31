@@ -21,19 +21,20 @@ export class DevWalletNetworkBadge extends LitElement {
 			.badge {
 				display: flex;
 				align-items: center;
-				gap: 4px;
-				padding: 3px 8px;
+				gap: 5px;
+				padding: 4px 10px;
 				border-radius: 999px;
 				font-size: 11px;
 				font-weight: var(--dev-wallet-font-weight-medium);
-				color: var(--dev-wallet-foreground);
-				background: var(--dev-wallet-secondary);
+				color: var(--dev-wallet-muted-foreground);
+				background: transparent;
+				border: 1px solid var(--dev-wallet-border);
 				cursor: pointer;
-				transition: background 0.15s;
+				transition: border-color 0.15s;
 			}
 
 			.badge:hover {
-				background: var(--dev-wallet-border);
+				border-color: var(--dev-wallet-border-med);
 			}
 
 			.dot {
@@ -45,7 +46,7 @@ export class DevWalletNetworkBadge extends LitElement {
 			.chevron {
 				width: 10px;
 				height: 10px;
-				color: var(--dev-wallet-muted-foreground);
+				color: var(--dev-wallet-tertiary);
 			}
 
 			.dropdown-item {

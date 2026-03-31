@@ -5,7 +5,7 @@ import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
 import type { DevWallet } from '../wallet/dev-wallet.js';
-import { connectDialogStyles, sharedStyles } from './styles.js';
+import { actionBarStyles, connectDialogStyles, sharedStyles } from './styles.js';
 import { WalletController } from './wallet-controller.js';
 
 @customElement('dev-wallet-panel')
@@ -13,6 +13,7 @@ export class DevWalletPanel extends LitElement {
 	static override styles = [
 		sharedStyles,
 		connectDialogStyles,
+		actionBarStyles,
 		css`
 			:host {
 				display: block;
@@ -55,7 +56,6 @@ export class DevWalletPanel extends LitElement {
 				max-height: 520px;
 				border-radius: var(--dev-wallet-radius-xl);
 				background: var(--dev-wallet-background);
-				border: 1px solid var(--dev-wallet-border);
 				box-shadow: var(--dev-wallet-shadow-lg);
 				display: flex;
 				flex-direction: column;
@@ -65,14 +65,14 @@ export class DevWalletPanel extends LitElement {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				padding: 14px 16px;
+				padding: 16px 20px;
 				border-bottom: 1px solid var(--dev-wallet-border);
 				position: relative;
 				z-index: 1;
 			}
 
 			.sidebar-title {
-				font-size: 15px;
+				font-size: 16px;
 				font-weight: var(--dev-wallet-font-weight-semibold);
 				color: var(--dev-wallet-foreground);
 			}
@@ -80,8 +80,8 @@ export class DevWalletPanel extends LitElement {
 			.close-btn {
 				font-size: 18px;
 				color: var(--dev-wallet-muted-foreground);
-				width: 28px;
-				height: 28px;
+				width: 30px;
+				height: 30px;
 				display: flex;
 				align-items: center;
 				justify-content: center;

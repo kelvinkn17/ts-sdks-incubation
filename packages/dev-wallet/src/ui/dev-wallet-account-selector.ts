@@ -32,30 +32,31 @@ export class DevWalletAccountSelector extends LitElement {
 			.active-account {
 				display: flex;
 				align-items: center;
-				gap: 8px;
+				gap: 12px;
 				width: 100%;
-				padding: 8px 10px;
-				border-radius: var(--dev-wallet-radius-md);
+				padding: 12px 14px;
+				border-radius: var(--dev-wallet-radius);
 				background: var(--dev-wallet-secondary);
+				border: 1px solid var(--dev-wallet-border);
 				cursor: pointer;
-				transition: background 0.15s;
+				transition: border-color 0.15s;
 			}
 
 			.active-account:hover {
-				background: var(--dev-wallet-border);
+				border-color: rgba(255, 255, 255, 0.15);
 			}
 
 			.avatar {
-				width: 28px;
-				height: 28px;
+				width: 34px;
+				height: 34px;
 				border-radius: 50%;
 				display: flex;
 				align-items: center;
 				justify-content: center;
-				font-size: 12px;
-				font-weight: var(--dev-wallet-font-weight-semibold);
-				color: var(--dev-wallet-primary-foreground);
-				background: var(--dev-wallet-primary);
+				font-size: 13px;
+				font-weight: var(--dev-wallet-font-weight-medium);
+				color: var(--dev-wallet-muted-foreground);
+				background: rgba(255, 255, 255, 0.08);
 				flex-shrink: 0;
 			}
 
@@ -65,8 +66,8 @@ export class DevWalletAccountSelector extends LitElement {
 			}
 
 			.account-label {
-				font-size: 13px;
-				font-weight: var(--dev-wallet-font-weight-semibold);
+				font-size: 14px;
+				font-weight: var(--dev-wallet-font-weight-medium);
 				color: var(--dev-wallet-foreground);
 				white-space: nowrap;
 				overflow: hidden;
@@ -74,25 +75,24 @@ export class DevWalletAccountSelector extends LitElement {
 			}
 
 			.account-address {
-				font-size: 11px;
+				font-size: 12px;
 				font-family: var(--dev-wallet-font-mono);
-				color: var(--dev-wallet-muted-foreground);
+				color: var(--dev-wallet-tertiary);
 			}
 
 			.copy-btn {
-				width: 22px;
-				height: 22px;
+				width: 24px;
+				height: 24px;
 				display: flex;
 				align-items: center;
 				justify-content: center;
 				border-radius: var(--dev-wallet-radius-xs);
-				color: var(--dev-wallet-muted-foreground);
+				color: var(--dev-wallet-tertiary);
 				flex-shrink: 0;
 				font-size: 12px;
 			}
 
 			.copy-btn:hover {
-				background: var(--dev-wallet-border);
 				color: var(--dev-wallet-foreground);
 			}
 
@@ -103,12 +103,12 @@ export class DevWalletAccountSelector extends LitElement {
 			.chevron {
 				width: 14px;
 				height: 14px;
-				color: var(--dev-wallet-muted-foreground);
+				color: var(--dev-wallet-tertiary);
 				flex-shrink: 0;
 			}
 
 			.dropdown-item[aria-selected='true'] {
-				background: color-mix(in oklab, var(--dev-wallet-primary) 10%, transparent);
+				background: rgba(255, 255, 255, 0.06);
 			}
 
 			.dropdown-item .avatar {
@@ -137,10 +137,10 @@ export class DevWalletAccountSelector extends LitElement {
 
 			.adapter-badge {
 				font-size: 9px;
-				padding: 1px 4px;
-				border-radius: var(--dev-wallet-radius-2xs);
-				background: var(--dev-wallet-secondary);
-				color: var(--dev-wallet-muted-foreground);
+				padding: 2px 6px;
+				border-radius: 999px;
+				background: rgba(255, 255, 255, 0.06);
+				color: var(--dev-wallet-tertiary);
 				white-space: nowrap;
 			}
 

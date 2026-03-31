@@ -33,23 +33,24 @@ export class DevWalletObjects extends LitElement {
 			.object-list {
 				display: flex;
 				flex-direction: column;
-				gap: 4px;
 			}
 
 			.object-item {
 				display: flex;
-				gap: 10px;
-				padding: 10px 12px;
-				border-radius: var(--dev-wallet-radius-sm);
-				border: 1px solid var(--dev-wallet-border);
-				background: var(--dev-wallet-secondary);
+				gap: 12px;
+				padding: 14px 0;
+				border-bottom: 1px solid var(--dev-wallet-border);
 				align-items: flex-start;
 			}
 
+			.object-item:last-child {
+				border-bottom: none;
+			}
+
 			.object-thumb {
-				width: 40px;
-				height: 40px;
-				border-radius: var(--dev-wallet-radius-xs);
+				width: 44px;
+				height: 44px;
+				border-radius: var(--dev-wallet-radius-sm);
 				object-fit: cover;
 				flex-shrink: 0;
 			}
@@ -69,7 +70,7 @@ export class DevWalletObjects extends LitElement {
 			}
 
 			.object-type {
-				font-size: 13px;
+				font-size: 14px;
 				font-weight: var(--dev-wallet-font-weight-medium);
 				color: var(--dev-wallet-foreground);
 				white-space: nowrap;
@@ -78,13 +79,12 @@ export class DevWalletObjects extends LitElement {
 			}
 
 			.object-type-badge {
-				font-size: 10px;
-				color: var(--dev-wallet-muted-foreground);
-				opacity: 0.8;
+				font-size: 11px;
+				color: var(--dev-wallet-tertiary);
 			}
 
 			.object-description {
-				font-size: 11px;
+				font-size: 12px;
 				color: var(--dev-wallet-muted-foreground);
 				overflow: hidden;
 				text-overflow: ellipsis;
@@ -93,23 +93,20 @@ export class DevWalletObjects extends LitElement {
 
 			.object-version {
 				font-size: 11px;
-				color: var(--dev-wallet-muted-foreground);
+				color: var(--dev-wallet-tertiary);
 				flex-shrink: 0;
 			}
 
 			.object-id {
-				font-size: 11px;
+				font-size: 12px;
 				font-family: var(--dev-wallet-font-mono);
-				color: var(--dev-wallet-muted-foreground);
+				color: var(--dev-wallet-tertiary);
 				cursor: pointer;
-				border-radius: var(--dev-wallet-radius-2xs);
-				padding: 1px 2px;
-				margin: -1px -2px;
-				transition: background 0.15s;
+				padding: 1px 0;
 			}
 
 			.object-id:hover {
-				background: color-mix(in oklab, var(--dev-wallet-primary) 15%, transparent);
+				color: var(--dev-wallet-muted-foreground);
 			}
 
 			.object-id.copied {
@@ -117,11 +114,11 @@ export class DevWalletObjects extends LitElement {
 			}
 
 			.load-more {
-				margin-top: 8px;
+				margin-top: 12px;
 				width: 100%;
-				padding: 8px;
-				border-radius: var(--dev-wallet-radius-sm);
-				font-size: 12px;
+				padding: 10px;
+				border-radius: 999px;
+				font-size: 13px;
 				font-weight: var(--dev-wallet-font-weight-medium);
 				color: var(--dev-wallet-primary);
 				background: transparent;
@@ -130,11 +127,11 @@ export class DevWalletObjects extends LitElement {
 			}
 
 			.load-more:hover {
-				background: var(--dev-wallet-secondary);
+				background: rgba(255, 255, 255, 0.04);
 			}
 
 			.load-more:disabled {
-				opacity: 0.5;
+				opacity: 0.4;
 				cursor: default;
 			}
 		`,

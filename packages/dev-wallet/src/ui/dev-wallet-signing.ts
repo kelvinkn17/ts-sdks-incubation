@@ -36,25 +36,25 @@ export class DevWalletSigning extends LitElement {
 			.signing-content {
 				flex: 1;
 				overflow-y: auto;
-				padding: 16px;
+				padding: 20px;
 			}
 
 			.signing-footer {
-				padding: 12px 16px;
+				padding: 16px 20px;
 				border-top: 1px solid var(--dev-wallet-border);
 			}
 
 			.signing-header {
 				display: flex;
 				align-items: center;
-				gap: 8px;
-				margin-bottom: 12px;
+				gap: 10px;
+				margin-bottom: 16px;
 			}
 
 			.signing-badge {
 				display: inline-block;
-				width: 8px;
-				height: 8px;
+				width: 10px;
+				height: 10px;
 				border-radius: 50%;
 				background: var(--dev-wallet-warning);
 				animation: pulse 2s infinite;
@@ -71,23 +71,25 @@ export class DevWalletSigning extends LitElement {
 			}
 
 			.signing-title {
-				font-size: 14px;
+				font-size: 16px;
 				font-weight: var(--dev-wallet-font-weight-semibold);
 				color: var(--dev-wallet-foreground);
 			}
 
 			.request-type {
-				font-size: 13px;
-				color: var(--dev-wallet-primary);
-				font-weight: var(--dev-wallet-font-weight-medium);
-				margin-bottom: 8px;
+				font-size: 12px;
+				font-weight: var(--dev-wallet-font-weight-semibold);
+				color: var(--dev-wallet-muted-foreground);
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+				margin-bottom: 12px;
 			}
 
 			.request-detail {
 				display: flex;
 				justify-content: space-between;
-				padding: 6px 0;
-				font-size: 12px;
+				padding: 10px 0;
+				font-size: 13px;
 				border-bottom: 1px solid var(--dev-wallet-border);
 			}
 
@@ -110,13 +112,12 @@ export class DevWalletSigning extends LitElement {
 
 			.detail-value.copyable-addr {
 				cursor: pointer;
-				border-radius: var(--dev-wallet-radius-2xs);
+				border-radius: 4px;
 				padding: 1px 3px;
-				transition: background 0.15s;
 			}
 
 			.detail-value.copyable-addr:hover {
-				background: color-mix(in oklab, var(--dev-wallet-primary) 15%, transparent);
+				color: var(--dev-wallet-primary);
 			}
 
 			.detail-value.copied {
@@ -124,36 +125,36 @@ export class DevWalletSigning extends LitElement {
 			}
 
 			.detail-secondary {
-				color: var(--dev-wallet-muted-foreground);
+				color: var(--dev-wallet-tertiary);
 				font-size: 0.85em;
 			}
 
 			.request-data {
-				margin: 12px 0;
-				padding: 8px;
-				border-radius: var(--dev-wallet-radius-xs);
-				background: var(--dev-wallet-background);
+				margin: 16px 0;
+				padding: 14px 16px;
+				border-radius: var(--dev-wallet-radius);
+				background: var(--dev-wallet-secondary);
 				font-family: var(--dev-wallet-font-mono);
-				font-size: 11px;
+				font-size: 12px;
 				color: var(--dev-wallet-muted-foreground);
-				max-height: 80px;
+				max-height: 100px;
 				overflow-y: auto;
 				word-break: break-all;
+				line-height: 1.6;
 			}
 
 			.section-label {
-				font-size: 11px;
+				font-size: 12px;
 				font-weight: var(--dev-wallet-font-weight-semibold);
 				color: var(--dev-wallet-muted-foreground);
 				text-transform: uppercase;
-				letter-spacing: 0.5px;
-				margin: 12px 0 6px;
+				letter-spacing: 0.05em;
+				margin: 16px 0 8px;
 			}
 
 			.coin-flows {
 				display: flex;
 				flex-direction: column;
-				gap: 4px;
 				margin-bottom: 4px;
 			}
 
@@ -161,10 +162,13 @@ export class DevWalletSigning extends LitElement {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				padding: 8px;
-				border-radius: var(--dev-wallet-radius-xs);
-				background: var(--dev-wallet-background);
-				font-size: 12px;
+				padding: 10px 0;
+				border-bottom: 1px solid var(--dev-wallet-border);
+				font-size: 13px;
+			}
+
+			.coin-flow-item:last-child {
+				border-bottom: none;
 			}
 
 			.coin-flow-type {
@@ -180,42 +184,44 @@ export class DevWalletSigning extends LitElement {
 			.commands-list {
 				display: flex;
 				flex-direction: column;
-				gap: 4px;
 			}
 
 			.command-item {
-				padding: 8px;
-				border-radius: var(--dev-wallet-radius-xs);
-				background: var(--dev-wallet-background);
-				font-size: 12px;
+				padding: 12px 0;
+				border-bottom: 1px solid var(--dev-wallet-border);
+				font-size: 13px;
+			}
+
+			.command-item:last-child {
+				border-bottom: none;
 			}
 
 			.command-kind {
-				font-weight: var(--dev-wallet-font-weight-semibold);
-				color: var(--dev-wallet-primary);
+				font-weight: var(--dev-wallet-font-weight-medium);
+				color: var(--dev-wallet-foreground);
 				margin-bottom: 2px;
 			}
 
 			.command-detail {
 				color: var(--dev-wallet-muted-foreground);
 				font-family: var(--dev-wallet-font-mono);
-				font-size: 11px;
+				font-size: 12px;
 				overflow: hidden;
 				text-overflow: ellipsis;
 				white-space: nowrap;
 			}
 
 			.command-args {
-				margin-top: 4px;
-				padding-left: 8px;
+				margin-top: 6px;
+				padding-left: 10px;
 				border-left: 2px solid var(--dev-wallet-border);
 			}
 
 			.command-arg {
-				font-size: 11px;
+				font-size: 12px;
 				color: var(--dev-wallet-muted-foreground);
 				font-family: var(--dev-wallet-font-mono);
-				padding: 1px 0;
+				padding: 2px 0;
 				overflow: hidden;
 				text-overflow: ellipsis;
 				white-space: nowrap;
@@ -223,32 +229,32 @@ export class DevWalletSigning extends LitElement {
 
 			.arg-access {
 				font-size: 10px;
-				padding: 1px 4px;
-				border-radius: var(--dev-wallet-radius-2xs);
+				padding: 2px 6px;
+				border-radius: 999px;
 				font-weight: var(--dev-wallet-font-weight-medium);
 			}
 
 			.arg-access-read {
-				background: color-mix(in oklab, var(--dev-wallet-primary) 20%, transparent);
+				background: rgba(0, 178, 255, 0.1);
 				color: var(--dev-wallet-primary);
 			}
 
 			.arg-access-mutate {
-				background: color-mix(in oklab, var(--dev-wallet-warning) 20%, transparent);
+				background: rgba(255, 153, 5, 0.1);
 				color: var(--dev-wallet-warning);
 			}
 
 			.arg-access-transfer {
-				background: color-mix(in oklab, var(--dev-wallet-destructive) 20%, transparent);
+				background: rgba(255, 43, 58, 0.1);
 				color: var(--dev-wallet-destructive);
 			}
 
 			.error-state {
-				padding: 10px;
-				border-radius: var(--dev-wallet-radius-xs);
-				background: color-mix(in oklab, var(--dev-wallet-destructive) 10%, transparent);
+				padding: 14px 16px;
+				border-radius: var(--dev-wallet-radius);
+				background: rgba(255, 43, 58, 0.08);
 				color: var(--dev-wallet-destructive);
-				font-size: 12px;
+				font-size: 13px;
 				word-break: break-word;
 			}
 
@@ -266,14 +272,14 @@ export class DevWalletSigning extends LitElement {
 			}
 
 			.error-hint {
-				font-size: 11px;
+				font-size: 12px;
 				opacity: 0.8;
 			}
 
 			.no-request {
 				text-align: center;
-				padding: 20px;
-				color: var(--dev-wallet-muted-foreground);
+				padding: 32px;
+				color: var(--dev-wallet-tertiary);
 				font-size: 13px;
 			}
 		`,
