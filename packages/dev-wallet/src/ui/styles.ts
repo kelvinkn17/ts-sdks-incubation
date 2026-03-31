@@ -37,9 +37,16 @@ const resetStyles = css`
 	}
 `;
 
-const themeStyles = css`
+/**
+ * Theme variables use a two-layer approach:
+ * - `themeDefaults` sets fallback values on :host (only matters for top-level components)
+ * - Top-level components (standalone, panel) override with :host([theme='light']) for light mode
+ * - Child components inherit variables from the parent through Shadow DOM, so they must NOT
+ *   redefine them. Child components only include `sharedStyles` (reset + typography, no color vars).
+ */
+export const themeVars = css`
 	:host {
-		/* Colors: neutral dark, no tinting */
+		/* Colors: neutral dark (default) */
 		--dev-wallet-background: #1c1c1e;
 		--dev-wallet-foreground: #f5f5f5;
 		--dev-wallet-primary: #00b2ff;
@@ -74,24 +81,6 @@ const themeStyles = css`
 		--dev-wallet-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
 		--dev-wallet-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.28),
 			0 0 0 1px rgba(255, 255, 255, 0.05);
-
-		/* Typography */
-		--dev-wallet-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-			Helvetica, Arial, sans-serif;
-		--dev-wallet-font-weight-medium: 500;
-		--dev-wallet-font-weight-semibold: 600;
-		--dev-wallet-font-mono: 'SF Mono', 'Fira Code', 'Fira Mono', Menlo, Consolas, monospace;
-
-		/* Font-size scale */
-		--dev-wallet-text-2xs: 10px;
-		--dev-wallet-text-xs: 11px;
-		--dev-wallet-text-sm: 12px;
-		--dev-wallet-text-base: 13px;
-		--dev-wallet-text-md: 14px;
-		--dev-wallet-text-lg: 15px;
-		--dev-wallet-text-xl: 16px;
-
-		letter-spacing: -0.01em;
 	}
 
 	/* Light theme */
@@ -119,6 +108,25 @@ const themeStyles = css`
 		--dev-wallet-shadow-lg: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.12);
 		--dev-wallet-hover: rgba(0, 0, 0, 0.04);
 		--dev-wallet-active: rgba(0, 0, 0, 0.07);
+	}
+`;
+
+const typographyStyles = css`
+	:host {
+		/* Typography */
+		--dev-wallet-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+			Helvetica, Arial, sans-serif;
+		--dev-wallet-font-weight-medium: 500;
+		--dev-wallet-font-weight-semibold: 600;
+		--dev-wallet-font-mono: 'SF Mono', 'Fira Code', 'Fira Mono', Menlo, Consolas, monospace;
+		--dev-wallet-text-2xs: 10px;
+		--dev-wallet-text-xs: 11px;
+		--dev-wallet-text-sm: 12px;
+		--dev-wallet-text-base: 13px;
+		--dev-wallet-text-md: 14px;
+		--dev-wallet-text-lg: 15px;
+		--dev-wallet-text-xl: 16px;
+		letter-spacing: -0.01em;
 	}
 `;
 
@@ -362,7 +370,7 @@ export const actionButtonStyles = css`
 
 	.btn-cancel:hover {
 		color: var(--dev-wallet-foreground);
-		border-color: rgba(255, 255, 255, 0.2);
+		border-color: var(--dev-wallet-border-med);
 	}
 
 	.btn-create {
@@ -406,12 +414,12 @@ export const stateStyles = css`
 
 export const sectionHeaderStyles = css`
 	.section-header {
-		font-size: 12px;
+		font-size: 11px;
 		font-weight: var(--dev-wallet-font-weight-semibold);
 		color: var(--dev-wallet-muted-foreground);
 		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		margin-bottom: 8px;
+		letter-spacing: 0.06em;
+		margin-bottom: 10px;
 	}
 `;
 
@@ -438,12 +446,12 @@ export const settingsToggleStyles = css`
 		display: inline-flex;
 		padding: 3px;
 		border-radius: var(--dev-wallet-radius-sm);
-		background: var(--dev-wallet-secondary);
+		background: var(--dev-wallet-active);
 		gap: 2px;
 	}
 
 	.segment {
-		padding: 5px 12px;
+		padding: 6px 12px;
 		border-radius: var(--dev-wallet-radius-xs);
 		font-size: 12px;
 		font-weight: var(--dev-wallet-font-weight-medium);
@@ -457,9 +465,9 @@ export const settingsToggleStyles = css`
 	}
 
 	.segment.active {
-		background: var(--dev-wallet-background);
-		color: var(--dev-wallet-foreground);
-		box-shadow: var(--dev-wallet-shadow-sm);
+		background: var(--dev-wallet-foreground);
+		color: var(--dev-wallet-background);
+		box-shadow: none;
 	}
 `;
 
@@ -650,4 +658,5 @@ const reducedMotionStyles = css`
 	}
 `;
 
-export const sharedStyles = [resetStyles, themeStyles, reducedMotionStyles];
+/** Shared styles for ALL components (child + top-level). No color vars, just reset + typography. */
+export const sharedStyles = [resetStyles, typographyStyles, reducedMotionStyles];

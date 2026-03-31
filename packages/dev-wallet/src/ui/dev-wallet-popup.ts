@@ -6,7 +6,7 @@ import { css, html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
 import type { PendingSigningRequest } from '../wallet/dev-wallet.js';
-import { sharedStyles } from './styles.js';
+import { sharedStyles, themeVars } from './styles.js';
 import './dev-wallet-connect.js';
 import './dev-wallet-signing.js';
 
@@ -14,6 +14,7 @@ import './dev-wallet-signing.js';
 export class DevWalletPopup extends LitElement {
 	static override styles = [
 		sharedStyles,
+		themeVars,
 		css`
 			:host {
 				display: flex;

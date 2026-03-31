@@ -144,7 +144,7 @@ export class DevWalletAccountSelector extends LitElement {
 			}
 
 			.item-badge {
-				font-size: 9px;
+				font-size: 10px;
 				padding: 2px 6px;
 				border-radius: 999px;
 				background: var(--dev-wallet-hover);

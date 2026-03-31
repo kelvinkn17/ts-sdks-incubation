@@ -127,11 +127,11 @@ export class DevWalletObjects extends LitElement {
 			}
 
 			.load-more:hover {
-				background: rgba(255, 255, 255, 0.04);
+				background: var(--dev-wallet-hover);
 			}
 
 			.load-more:disabled {
-				opacity: 0.4;
+				opacity: 0.5;
 				cursor: default;
 			}
 		`,

@@ -10,6 +10,7 @@ import {
 	balanceDetailStyles,
 	connectDialogStyles,
 	sharedStyles,
+	themeVars,
 } from './styles.js';
 import { WalletController } from './wallet-controller.js';
 
@@ -17,6 +18,7 @@ import { WalletController } from './wallet-controller.js';
 export class DevWalletPanel extends LitElement {
 	static override styles = [
 		sharedStyles,
+		themeVars,
 		connectDialogStyles,
 		actionBarStyles,
 		balanceDetailStyles,
@@ -88,8 +90,6 @@ export class DevWalletPanel extends LitElement {
 			}
 
 			.close-btn {
-				font-size: 18px;
-				color: var(--dev-wallet-tertiary);
 				width: 28px;
 				height: 28px;
 				display: flex;
@@ -97,10 +97,17 @@ export class DevWalletPanel extends LitElement {
 				justify-content: center;
 				border-radius: var(--dev-wallet-radius-xs);
 				flex-shrink: 0;
+				color: var(--dev-wallet-muted-foreground);
+			}
+
+			.close-btn svg {
+				width: 16px;
+				height: 16px;
 			}
 
 			.close-btn:hover {
 				color: var(--dev-wallet-foreground);
+				background: var(--dev-wallet-hover);
 			}
 
 			.sidebar-body {
@@ -200,7 +207,7 @@ export class DevWalletPanel extends LitElement {
 						aria-label="Close"
 						@click=${this.#togglePanel}
 					>
-						&times;
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
 					</button>
 				</div>
 				<div class="sidebar-body">${this.#ctrl.renderTabContent()}</div>

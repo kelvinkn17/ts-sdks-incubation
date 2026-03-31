@@ -29,9 +29,9 @@ export class DevWalletTabBar extends LitElement {
 				align-items: center;
 				justify-content: center;
 				gap: 5px;
-				font-size: 11px;
+				font-size: 12px;
 				font-weight: var(--dev-wallet-font-weight-medium);
-				color: var(--dev-wallet-tertiary);
+				color: var(--dev-wallet-muted-foreground);
 				transition: color 0.15s;
 			}
 

@@ -117,7 +117,7 @@ export class DevWalletConnect extends LitElement {
 				letter-spacing: 0.04em;
 				padding: 2px 8px;
 				border-radius: 999px;
-				background: rgba(255, 255, 255, 0.06);
+				background: var(--dev-wallet-hover);
 				color: var(--dev-wallet-tertiary);
 				margin-left: 6px;
 			}

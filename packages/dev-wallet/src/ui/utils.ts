@@ -62,7 +62,7 @@ export const NETWORK_COLORS: Record<string, string> = {
 	mainnet: '#ff9905',
 	testnet: '#00bc7e',
 	devnet: '#00b2ff',
-	localnet: 'rgba(255, 255, 255, 0.3)',
+	localnet: '#888',
 };
 
 export interface PairableAdapter {

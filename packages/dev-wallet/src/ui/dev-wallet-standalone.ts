@@ -10,6 +10,7 @@ import {
 	balanceDetailStyles,
 	connectDialogStyles,
 	sharedStyles,
+	themeVars,
 } from './styles.js';
 import { WalletController } from './wallet-controller.js';
 
@@ -17,6 +18,7 @@ import { WalletController } from './wallet-controller.js';
 export class DevWalletStandalone extends LitElement {
 	static override styles = [
 		sharedStyles,
+		themeVars,
 		connectDialogStyles,
 		actionBarStyles,
 		balanceDetailStyles,
@@ -58,26 +60,8 @@ export class DevWalletStandalone extends LitElement {
 			.header-right {
 				display: flex;
 				align-items: center;
-				gap: 10px;
+				gap: 8px;
 				margin-left: auto;
-			}
-
-			.status-indicator {
-				display: flex;
-				align-items: center;
-				gap: 5px;
-			}
-
-			.status-dot {
-				width: 6px;
-				height: 6px;
-				border-radius: 50%;
-				background: var(--dev-wallet-status-connected);
-			}
-
-			.status-text {
-				font-size: 11px;
-				color: var(--dev-wallet-tertiary);
 			}
 
 			.card-body {
@@ -173,10 +157,6 @@ export class DevWalletStandalone extends LitElement {
 					<span class="card-title">${this.wallet?.name ?? 'Dev Wallet'}</span>
 					<div class="header-right">
 						${this.#ctrl.renderNetworkBadge()}
-						<div class="status-indicator">
-							<span class="status-dot"></span>
-							<span class="status-text">Running</span>
-						</div>
 					</div>
 				</div>
 				<div class="card-body">${this.#ctrl.renderTabContent()}</div>

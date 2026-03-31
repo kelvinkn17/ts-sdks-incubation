@@ -336,7 +336,7 @@ export class DevWalletSettings extends LitElement {
 			}
 
 			.btn-copy:hover {
-				background: rgba(255, 255, 255, 0.12);
+				background: var(--dev-wallet-active);
 				color: var(--dev-wallet-foreground);
 			}
 		`,
@@ -420,7 +420,7 @@ export class DevWalletSettings extends LitElement {
 			<h3 class="section-header">Networks</h3>
 			<div class="network-list">
 				${networks.map((name) => {
-					const color = NETWORK_COLORS[name] ?? 'rgba(255,255,255,0.3)';
+					const color = NETWORK_COLORS[name] ?? '#888';
 					const isActive = name === activeNetwork;
 					const isEditing = this._editingNetwork === name;
 					return html`
@@ -459,7 +459,7 @@ export class DevWalletSettings extends LitElement {
 												aria-label="Save URL"
 												@click=${() => this.#saveNetworkUrl(name)}
 											>
-												&#10003;
+												<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
 											</button>
 											<button
 												class="btn-icon"
@@ -467,7 +467,7 @@ export class DevWalletSettings extends LitElement {
 												aria-label="Cancel editing"
 												@click=${this.#cancelEditNetwork}
 											>
-												&#10005;
+												<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
 											</button>
 										`
 									: html`
@@ -477,7 +477,7 @@ export class DevWalletSettings extends LitElement {
 												aria-label="Edit network URL"
 												@click=${() => this.#startEditNetwork(name, urls[name] ?? '')}
 											>
-												&#9998;
+												<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
 											</button>
 											${!isActive
 												? html`<button
@@ -486,7 +486,7 @@ export class DevWalletSettings extends LitElement {
 														aria-label="Remove network"
 														@click=${() => this.#removeNetwork(name)}
 													>
-														&#10005;
+														<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
 													</button>`
 												: nothing}
 										`}
