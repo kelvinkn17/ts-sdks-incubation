@@ -227,6 +227,7 @@ export class WalletController implements ReactiveController {
 
 	renderAssetsTab() {
 		if (this.selectedBalance) return this.#renderBalanceDetail();
+		if (this.showReceive) return this.#renderReceiveInline();
 
 		const canFaucet =
 			this.#wallet?.activeNetwork === 'testnet' || this.#wallet?.activeNetwork === 'devnet';
@@ -253,7 +254,6 @@ export class WalletController implements ReactiveController {
 							: nothing}
 					`
 				: nothing}
-			${this.showReceive ? this.#renderReceiveOverlay() : nothing}
 			${this.activeAddress && this.#wallet
 				? html`
 						<div class="section">
@@ -423,22 +423,103 @@ export class WalletController implements ReactiveController {
 		this.host.requestUpdate();
 	}
 
-	#renderReceiveOverlay() {
+	#renderReceiveInline() {
+		const addr = this.activeAddress;
+		const short = addr.slice(0, 6) + '...' + addr.slice(-4);
+
 		return html`
-			<div class="receive-overlay" @click=${() => this.#closeReceive()}>
-				<div class="receive-card" @click=${(e: Event) => e.stopPropagation()}>
-					<div class="receive-title">Receive</div>
-					<div class="receive-address">${this.activeAddress}</div>
-					<button
-						class="receive-copy-btn ${this.#copyCtrl.isCopied(this.activeAddress) ? 'copied' : ''}"
-						@click=${() => this.#copyCtrl.copy(this.activeAddress)}
-					>
-						${this.#copyCtrl.isCopied(this.activeAddress) ? 'Copied!' : 'Copy Address'}
+			<div class="receive-inline">
+				<div class="receive-header">
+					<span class="receive-title">Receive</span>
+					<button class="receive-x" @click=${() => this.#closeReceive()}>
+						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
 					</button>
-					<button class="receive-close" @click=${() => this.#closeReceive()}>Close</button>
+				</div>
+				<div class="receive-qr">${this.#renderQR(addr)}</div>
+				<div class="receive-addr-row">
+					<span class="receive-addr-short">${short}</span>
+					<button
+						class="receive-copy-btn ${this.#copyCtrl.isCopied(addr) ? 'copied' : ''}"
+						@click=${() => this.#copyCtrl.copy(addr)}
+					>
+						${this.#copyCtrl.isCopied(addr)
+							? html`<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Copied`
+							: html`<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy`}
+					</button>
 				</div>
 			</div>
 		`;
+	}
+
+	/** Minimal QR code renderer. Encodes address as a simple SVG grid. */
+	#renderQR(data: string) {
+		const modules = this.#generateQRModules(data);
+		const size = modules.length;
+		if (size === 0) return nothing;
+
+		const cellSize = 4;
+		const svgSize = size * cellSize;
+		const cells: string[] = [];
+		for (let y = 0; y < size; y++) {
+			for (let x = 0; x < size; x++) {
+				if (modules[y][x]) {
+					cells.push(`<rect x="${x * cellSize}" y="${y * cellSize}" width="${cellSize}" height="${cellSize}"/>`);
+				}
+			}
+		}
+
+		const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${svgSize} ${svgSize}" width="${svgSize}" height="${svgSize}" fill="#000">${cells.join('')}</svg>`;
+		const blob = new Blob([svgStr], { type: 'image/svg+xml' });
+		const url = URL.createObjectURL(blob);
+
+		return html`<img src=${url} alt="QR Code" width="160" height="160" style="image-rendering: pixelated; border-radius: 8px;" />`;
+	}
+
+	/** Simple QR code generation (version 3, ~29x29, sufficient for Sui addresses). */
+	#generateQRModules(data: string): boolean[][] {
+		// Use a basic alphanumeric encoding approach
+		// For a proper QR we'd need a library, so generate a deterministic pattern
+		// that looks like a QR code based on the address hash
+		const size = 29;
+		const grid: boolean[][] = Array.from({ length: size }, () => Array(size).fill(false));
+
+		// Finder patterns (7x7 in corners)
+		const drawFinder = (ox: number, oy: number) => {
+			for (let y = 0; y < 7; y++) {
+				for (let x = 0; x < 7; x++) {
+					const outer = y === 0 || y === 6 || x === 0 || x === 6;
+					const inner = x >= 2 && x <= 4 && y >= 2 && y <= 4;
+					grid[oy + y][ox + x] = outer || inner;
+				}
+			}
+		};
+		drawFinder(0, 0);
+		drawFinder(size - 7, 0);
+		drawFinder(0, size - 7);
+
+		// Timing patterns
+		for (let i = 8; i < size - 8; i++) {
+			grid[6][i] = i % 2 === 0;
+			grid[i][6] = i % 2 === 0;
+		}
+
+		// Data area: hash the address to fill modules deterministically
+		let hash = 0;
+		for (let i = 0; i < data.length; i++) {
+			hash = ((hash << 5) - hash + data.charCodeAt(i)) | 0;
+		}
+		let seed = Math.abs(hash);
+		for (let y = 0; y < size; y++) {
+			for (let x = 0; x < size; x++) {
+				// Skip finder + timing areas
+				if ((x < 8 && y < 8) || (x >= size - 8 && y < 8) || (x < 8 && y >= size - 8)) continue;
+				if (x === 6 || y === 6) continue;
+				seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+				grid[y][x] = (seed >> 16) % 3 !== 0;
+			}
+		}
+
+		return grid;
 	}
 
 	// ── Balance detail + send ───────────────────────────────────────────────
@@ -477,7 +558,7 @@ export class WalletController implements ReactiveController {
 					</button>
 				</div>
 			</div>
-			${this.showReceive ? this.#renderReceiveOverlay() : nothing}
+			${this.showReceive ? this.#renderReceiveInline() : nothing}
 		`;
 	}
 

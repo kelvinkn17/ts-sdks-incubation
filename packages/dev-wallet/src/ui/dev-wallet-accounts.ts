@@ -282,8 +282,15 @@ export class DevWalletAccounts extends LitElement {
 	@property({ type: String })
 	activeAddress = '';
 
+	@property({ type: Boolean, attribute: 'hide-header' })
+	hideHeader = false;
+
 	@state()
 	private _dialogOpen = false;
+
+	openAddDialog() {
+		this._dialogOpen = true;
+	}
 
 	#copy = new CopyController(this);
 
@@ -313,14 +320,16 @@ export class DevWalletAccounts extends LitElement {
 		);
 
 		return html`
-			<div class="accounts-header">
-				<h3 class="section-header">Accounts</h3>
-				${canAdd
-					? html`<button class="add-btn" part="add-button" @click=${this.#openDialog}>
-							+ Add
-						</button>`
-					: nothing}
-			</div>
+			${!this.hideHeader
+				? html`<div class="accounts-header">
+						<h3 class="section-header">Accounts</h3>
+						${canAdd
+							? html`<button class="add-btn" part="add-button" @click=${this.#openDialog}>
+									+ Add
+								</button>`
+							: nothing}
+					</div>`
+				: nothing}
 			${this.accounts.length === 0
 				? html`<div class="empty-state" part="empty-state">No accounts yet</div>`
 				: html`
@@ -373,7 +382,16 @@ export class DevWalletAccounts extends LitElement {
 																		this.#startEditLabel(account.address, index);
 																	}}
 																>
-																	<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+																	<svg
+																		viewBox="0 0 24 24"
+																		width="14"
+																		height="14"
+																		fill="none"
+																		stroke="currentColor"
+																		stroke-width="2"
+																	>
+																		<path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5Z" />
+																	</svg>
 																</button>`
 															: nothing}
 													</div>`}
@@ -412,7 +430,18 @@ export class DevWalletAccounts extends LitElement {
 														this.#promptDelete(account.address);
 													}}
 												>
-													<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+													<svg
+														viewBox="0 0 24 24"
+														width="14"
+														height="14"
+														fill="none"
+														stroke="currentColor"
+														stroke-width="2"
+													>
+														<path
+															d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"
+														/>
+													</svg>
 												</button>`
 											: nothing}
 									</button>

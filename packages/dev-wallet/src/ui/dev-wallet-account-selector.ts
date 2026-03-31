@@ -153,7 +153,8 @@ export class DevWalletAccountSelector extends LitElement {
 			}
 
 			.selector-wrapper {
-				--dropdown-max-height: 260px;
+				--dropdown-max-height: 240px;
+				width: 100%;
 			}
 
 			.empty-state {
@@ -191,6 +192,7 @@ export class DevWalletAccountSelector extends LitElement {
 		return html`
 			<div class="hero">
 				<dev-wallet-dropdown
+					full-width
 					class="selector-wrapper"
 					.open=${this._open}
 					@close=${() => (this._open = false)}

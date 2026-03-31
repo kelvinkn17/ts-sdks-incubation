@@ -85,29 +85,29 @@ export const themeVars = css`
 
 	/* Light theme */
 	:host([theme='light']) {
-		--dev-wallet-background: #f7f7f5;
+		--dev-wallet-background: #ffffff;
 		--dev-wallet-foreground: #1a1a1a;
 		--dev-wallet-primary: #00b2ff;
 		--dev-wallet-primary-foreground: #ffffff;
-		--dev-wallet-secondary: #f0efed;
+		--dev-wallet-secondary: #f5f5f3;
 		--dev-wallet-secondary-foreground: #1a1a1a;
-		--dev-wallet-muted: #f0efed;
-		--dev-wallet-muted-foreground: rgba(0, 0, 0, 0.4);
-		--dev-wallet-tertiary: rgba(0, 0, 0, 0.25);
-		--dev-wallet-destructive: #ff2b3a;
-		--dev-wallet-positive: #00bc7e;
-		--dev-wallet-warning: #ff9905;
-		--dev-wallet-border: rgba(0, 0, 0, 0.06);
-		--dev-wallet-border-med: rgba(0, 0, 0, 0.08);
-		--dev-wallet-input: rgba(0, 0, 0, 0.06);
+		--dev-wallet-muted: #f5f5f3;
+		--dev-wallet-muted-foreground: rgba(0, 0, 0, 0.5);
+		--dev-wallet-tertiary: rgba(0, 0, 0, 0.35);
+		--dev-wallet-destructive: #e5222e;
+		--dev-wallet-positive: #00a06a;
+		--dev-wallet-warning: #e08600;
+		--dev-wallet-border: rgba(0, 0, 0, 0.1);
+		--dev-wallet-border-med: rgba(0, 0, 0, 0.14);
+		--dev-wallet-input: rgba(0, 0, 0, 0.1);
 		--dev-wallet-ring: #00b2ff;
-		--dev-wallet-status-connected: #00bc7e;
-		--dev-wallet-status-disconnected: rgba(0, 0, 0, 0.25);
-		--dev-wallet-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
-		--dev-wallet-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-		--dev-wallet-shadow-lg: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.12);
-		--dev-wallet-hover: rgba(0, 0, 0, 0.04);
-		--dev-wallet-active: rgba(0, 0, 0, 0.07);
+		--dev-wallet-status-connected: #00a06a;
+		--dev-wallet-status-disconnected: rgba(0, 0, 0, 0.3);
+		--dev-wallet-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+		--dev-wallet-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+		--dev-wallet-shadow-lg: 0 0 0 1px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.14);
+		--dev-wallet-hover: rgba(0, 0, 0, 0.06);
+		--dev-wallet-active: rgba(0, 0, 0, 0.1);
 	}
 `;
 
@@ -257,72 +257,90 @@ export const actionBarStyles = css`
 		padding: 0 0 8px;
 	}
 
-	/* -- Receive dialog ---------------------------------------------------- */
+	/* -- Receive (inline, replaces tab content) --------------------------- */
 
-	.receive-overlay {
-		position: fixed;
-		inset: 0;
-		z-index: 100;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		background: rgba(0, 0, 0, 0.5);
+	.receive-inline {
+		padding: 4px 0;
 	}
 
-	.receive-card {
-		width: 300px;
-		padding: 24px;
-		border-radius: var(--dev-wallet-radius-xl);
-		background: var(--dev-wallet-background);
-		box-shadow: var(--dev-wallet-shadow-lg);
-		text-align: center;
+	.receive-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 16px;
 	}
 
 	.receive-title {
-		font-size: 16px;
+		font-size: 15px;
 		font-weight: var(--dev-wallet-font-weight-semibold);
 		color: var(--dev-wallet-foreground);
-		margin-bottom: 16px;
 	}
 
-	.receive-address {
-		font-size: 12px;
+	.receive-x {
+		width: 28px;
+		height: 28px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: var(--dev-wallet-radius-xs);
+		color: var(--dev-wallet-muted-foreground);
+	}
+
+	.receive-x svg {
+		width: 16px;
+		height: 16px;
+	}
+
+	.receive-x:hover {
+		color: var(--dev-wallet-foreground);
+		background: var(--dev-wallet-hover);
+	}
+
+	.receive-qr {
+		display: flex;
+		justify-content: center;
+		padding: 20px;
+		margin-bottom: 16px;
+		background: #ffffff;
+		border-radius: var(--dev-wallet-radius);
+	}
+
+	.receive-qr img {
+		display: block;
+	}
+
+	.receive-addr-row {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+	}
+
+	.receive-addr-short {
+		font-size: 14px;
 		font-family: var(--dev-wallet-font-mono);
 		color: var(--dev-wallet-muted-foreground);
-		word-break: break-all;
-		line-height: 1.6;
-		padding: 14px 16px;
-		border-radius: var(--dev-wallet-radius);
-		background: var(--dev-wallet-secondary);
-		margin-bottom: 16px;
 	}
 
 	.receive-copy-btn {
-		padding: 10px 24px;
+		display: inline-flex;
+		align-items: center;
+		gap: 5px;
+		padding: 6px 14px;
 		border-radius: 999px;
-		font-size: 13px;
+		font-size: 12px;
 		font-weight: var(--dev-wallet-font-weight-medium);
-		color: var(--dev-wallet-primary-foreground);
-		background: var(--dev-wallet-primary);
+		color: var(--dev-wallet-muted-foreground);
+		background: var(--dev-wallet-hover);
 	}
 
 	.receive-copy-btn:hover {
-		filter: brightness(0.9);
+		background: var(--dev-wallet-active);
+		color: var(--dev-wallet-foreground);
 	}
 
 	.receive-copy-btn.copied {
-		background: var(--dev-wallet-positive);
-	}
-
-	.receive-close {
-		display: block;
-		margin-top: 12px;
-		font-size: 13px;
-		color: var(--dev-wallet-muted-foreground);
-	}
-
-	.receive-close:hover {
-		color: var(--dev-wallet-foreground);
+		color: var(--dev-wallet-positive);
 	}
 `;
 

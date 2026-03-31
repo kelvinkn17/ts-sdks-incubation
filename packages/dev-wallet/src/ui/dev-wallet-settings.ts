@@ -7,7 +7,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 
 import type { DevWallet } from '../wallet/dev-wallet.js';
 import type { SignerAdapter } from '../types.js';
-import { sectionHeaderStyles, settingsToggleStyles, sharedStyles } from './styles.js';
+import { settingsToggleStyles, sharedStyles } from './styles.js';
 import { emitEvent, formatAddress, getErrorMessage, NETWORK_COLORS } from './utils.js';
 import './dev-wallet-accounts.js';
 
@@ -15,19 +15,114 @@ import './dev-wallet-accounts.js';
 export class DevWalletSettings extends LitElement {
 	static override styles = [
 		sharedStyles,
-		sectionHeaderStyles,
 		settingsToggleStyles,
 		css`
 			:host {
 				display: block;
 			}
 
-			.section {
-				margin-bottom: 28px;
+			/* -- Quick preferences ------------------------------------------ */
+
+			.quick-prefs {
+				border-bottom: 1px solid var(--dev-wallet-border);
 			}
 
-			.section:last-child {
-				margin-bottom: 0;
+			.quick-prefs .setting-row {
+				padding: 10px 0;
+			}
+
+			/* -- Collapsible sections --------------------------------------- */
+
+			.collapsible {
+				border-bottom: 1px solid var(--dev-wallet-border);
+			}
+
+			.collapsible:last-child {
+				border-bottom: none;
+			}
+
+			.collapsible-header {
+				display: flex;
+				align-items: center;
+				width: 100%;
+				padding: 12px 0;
+				gap: 8px;
+				cursor: pointer;
+				user-select: none;
+			}
+
+			.collapsible-title {
+				font-size: 11px;
+				font-weight: var(--dev-wallet-font-weight-semibold);
+				color: var(--dev-wallet-muted-foreground);
+				text-transform: uppercase;
+				letter-spacing: 0.06em;
+				transition: color 0.15s;
+			}
+
+			.collapsible-header:hover .collapsible-title {
+				color: var(--dev-wallet-foreground);
+			}
+
+			.collapsible-badge {
+				font-size: 10px;
+				padding: 1px 7px;
+				border-radius: 999px;
+				background: var(--dev-wallet-active);
+				color: var(--dev-wallet-tertiary);
+				font-weight: var(--dev-wallet-font-weight-medium);
+			}
+
+			.collapsible-badge.connected {
+				color: var(--dev-wallet-positive);
+				background: rgba(0, 188, 126, 0.1);
+			}
+
+			.collapsible-spacer {
+				flex: 1;
+			}
+
+			.collapsible-action {
+				font-size: 12px;
+				color: var(--dev-wallet-primary);
+				padding: 2px 10px;
+				border-radius: 999px;
+			}
+
+			.collapsible-action:hover {
+				background: rgba(0, 178, 255, 0.08);
+			}
+
+			.collapsible-chevron {
+				color: var(--dev-wallet-tertiary);
+				transition: transform 0.15s ease;
+				flex-shrink: 0;
+			}
+
+			.collapsible-header:hover .collapsible-chevron {
+				color: var(--dev-wallet-muted-foreground);
+			}
+
+			.collapsible-chevron.expanded {
+				transform: rotate(180deg);
+			}
+
+			.collapsible-body {
+				display: grid;
+				grid-template-rows: 0fr;
+				transition: grid-template-rows 0.2s ease;
+			}
+
+			.collapsible-body.expanded {
+				grid-template-rows: 1fr;
+			}
+
+			.collapsible-body-inner {
+				overflow: hidden;
+			}
+
+			.collapsible-content {
+				padding-bottom: 8px;
 			}
 
 			/* -- Networks --------------------------------------------------- */
@@ -41,7 +136,7 @@ export class DevWalletSettings extends LitElement {
 				display: flex;
 				align-items: flex-start;
 				gap: 12px;
-				padding: 14px 0;
+				padding: 12px 0;
 				border-bottom: 1px solid var(--dev-wallet-border);
 			}
 
@@ -70,7 +165,7 @@ export class DevWalletSettings extends LitElement {
 			}
 
 			.network-name {
-				font-size: 14px;
+				font-size: 13px;
 				font-weight: var(--dev-wallet-font-weight-medium);
 				color: var(--dev-wallet-foreground);
 			}
@@ -139,14 +234,14 @@ export class DevWalletSettings extends LitElement {
 				background: rgba(255, 43, 58, 0.08);
 			}
 
-			/* -- Add network form --------------------------------------------- */
+			/* -- Add network form ------------------------------------------- */
 
 			.add-network-form {
 				display: flex;
 				flex-direction: column;
 				gap: 10px;
-				margin-top: 16px;
-				padding: 16px;
+				margin-top: 12px;
+				padding: 14px;
 				border-radius: var(--dev-wallet-radius);
 				border: 1px solid var(--dev-wallet-border);
 				background: var(--dev-wallet-secondary);
@@ -154,7 +249,7 @@ export class DevWalletSettings extends LitElement {
 
 			.form-input {
 				width: 100%;
-				padding: 10px 12px;
+				padding: 8px 12px;
 				border-radius: var(--dev-wallet-radius-sm);
 				border: 1px solid var(--dev-wallet-border);
 				background: var(--dev-wallet-background);
@@ -180,7 +275,7 @@ export class DevWalletSettings extends LitElement {
 			}
 
 			.btn-sm {
-				padding: 8px 16px;
+				padding: 7px 14px;
 				border-radius: 999px;
 				font-size: 12px;
 				font-weight: var(--dev-wallet-font-weight-medium);
@@ -208,7 +303,7 @@ export class DevWalletSettings extends LitElement {
 			.btn-toggle {
 				font-size: 13px;
 				color: var(--dev-wallet-primary);
-				padding: 8px 0;
+				padding: 6px 0;
 				margin-top: 4px;
 			}
 
@@ -272,14 +367,14 @@ export class DevWalletSettings extends LitElement {
 			/* -- Bookmarklet ------------------------------------------------ */
 
 			.bookmarklet-link-wrapper {
-				margin-top: 12px;
+				margin-top: 10px;
 			}
 
 			.bookmarklet-link {
 				display: inline-flex;
 				align-items: center;
 				gap: 6px;
-				padding: 10px 18px;
+				padding: 8px 16px;
 				border-radius: 999px;
 				background: var(--dev-wallet-primary);
 				color: var(--dev-wallet-primary-foreground);
@@ -309,12 +404,12 @@ export class DevWalletSettings extends LitElement {
 			.console-snippet {
 				position: relative;
 				margin-top: 10px;
-				padding: 14px 16px;
+				padding: 12px 14px;
 				border-radius: var(--dev-wallet-radius);
 				background: var(--dev-wallet-secondary);
 				border: 1px solid var(--dev-wallet-border);
 				font-family: var(--dev-wallet-font-mono);
-				font-size: 12px;
+				font-size: 11px;
 				color: var(--dev-wallet-foreground);
 				line-height: 1.6;
 				white-space: pre-wrap;
@@ -326,7 +421,7 @@ export class DevWalletSettings extends LitElement {
 				position: absolute;
 				top: 8px;
 				right: 8px;
-				padding: 4px 10px;
+				padding: 3px 8px;
 				border-radius: 999px;
 				background: var(--dev-wallet-active);
 				color: var(--dev-wallet-muted-foreground);
@@ -336,7 +431,6 @@ export class DevWalletSettings extends LitElement {
 			}
 
 			.btn-copy:hover {
-				background: var(--dev-wallet-active);
 				color: var(--dev-wallet-foreground);
 			}
 		`,
@@ -356,6 +450,9 @@ export class DevWalletSettings extends LitElement {
 
 	@property({ type: String })
 	bookmarkletOrigin = '';
+
+	@state()
+	private _expandedSections = new Set(['networks', 'accounts']);
 
 	@state()
 	private _showAddNetwork = false;
@@ -391,6 +488,11 @@ export class DevWalletSettings extends LitElement {
 			if (ps === 'open' || ps === 'closed' || ps === 'remember') this._panelState = ps;
 			const th = localStorage.getItem('dev-wallet:theme');
 			if (th === 'system' || th === 'light' || th === 'dark') this._theme = th;
+			const expanded = localStorage.getItem('dev-wallet:expanded-sections');
+			if (expanded) {
+				const parsed = JSON.parse(expanded);
+				if (Array.isArray(parsed)) this._expandedSections = new Set(parsed);
+			}
 		} catch {
 			// localStorage unavailable
 		}
@@ -398,18 +500,144 @@ export class DevWalletSettings extends LitElement {
 
 	override render() {
 		return html`
-			<div class="section">${this.#renderNetworks()}</div>
+			<div class="quick-prefs">${this.#renderPreferences()}</div>
+			${this.#renderCollapsible('networks', 'Networks', () => this.#renderNetworksContent(), {
+				badge: this.wallet ? `${this.wallet.availableNetworks.length}` : undefined,
+			})}
 			${this.#hasCliAdapter()
-				? html`<div class="section">${this.#renderCliSigner()}</div>`
+				? this.#renderCollapsible('cli', 'CLI Signer', () => this.#renderCliContent(), {
+						badge: this.#getCliStatusLabel(),
+						badgeClass: this.#isCliConnected() ? 'connected' : '',
+					})
 				: nothing}
-			<div class="section">${this.#renderAccounts()}</div>
-			<div class="section">${this.#renderPreferences()}</div>
-			<div class="section">${this.#renderBookmarklet()}</div>
-			<div class="section">${this.#renderAbout()}</div>
+			${this.#renderCollapsible('accounts', 'Accounts', () => this.#renderAccountsContent(), {
+				badge: this.accounts.length > 0 ? `${this.accounts.length}` : undefined,
+				action: this.#canAddAccounts()
+					? html`<button
+							class="collapsible-action"
+							@click=${(e: Event) => {
+								e.stopPropagation();
+								this.#openAddAccountDialog();
+							}}
+						>
+							+ Add
+						</button>`
+					: undefined,
+			})}
+			${this.bookmarkletOrigin
+				? this.#renderCollapsible('bookmarklet', 'Bookmarklet', () =>
+						this.#renderBookmarkletContent(),
+					)
+				: nothing}
+			${this.#renderCollapsible('about', 'About', () => this.#renderAboutContent())}
 		`;
 	}
 
-	#renderNetworks() {
+	/* -- Collapsible section helper ------------------------------------- */
+
+	#renderCollapsible(
+		id: string,
+		title: string,
+		renderContent: () => unknown,
+		options?: { badge?: string; badgeClass?: string; action?: unknown },
+	) {
+		const expanded = this._expandedSections.has(id);
+		return html`
+			<div class="collapsible">
+				<div
+					class="collapsible-header"
+					role="button"
+					tabindex="0"
+					aria-expanded=${String(expanded)}
+					@click=${() => this.#toggleSection(id)}
+					@keydown=${(e: KeyboardEvent) => {
+						if (e.key === 'Enter' || e.key === ' ') {
+							e.preventDefault();
+							this.#toggleSection(id);
+						}
+					}}
+				>
+					<span class="collapsible-title">${title}</span>
+					${options?.badge
+						? html`<span class="collapsible-badge ${options.badgeClass ?? ''}"
+								>${options.badge}</span
+							>`
+						: nothing}
+					<span class="collapsible-spacer"></span>
+					${options?.action ?? nothing}
+					<svg
+						class="collapsible-chevron ${expanded ? 'expanded' : ''}"
+						viewBox="0 0 24 24"
+						width="14"
+						height="14"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2.5"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					>
+						<path d="M6 9l6 6 6-6" />
+					</svg>
+				</div>
+				<div class="collapsible-body ${expanded ? 'expanded' : ''}">
+					<div class="collapsible-body-inner">
+						<div class="collapsible-content">${renderContent()}</div>
+					</div>
+				</div>
+			</div>
+		`;
+	}
+
+	#toggleSection(id: string) {
+		const next = new Set(this._expandedSections);
+		if (next.has(id)) next.delete(id);
+		else next.add(id);
+		this._expandedSections = next;
+		try {
+			localStorage.setItem('dev-wallet:expanded-sections', JSON.stringify([...next]));
+		} catch {
+			// ignore
+		}
+	}
+
+	/* -- Content renderers ---------------------------------------------- */
+
+	#renderPreferences() {
+		return html`
+			<div class="setting-row">
+				<span class="setting-label">Theme</span>
+				<div class="segmented-control">
+					${(['system', 'light', 'dark'] as const).map(
+						(val) => html`
+							<button
+								class="segment ${this._theme === val ? 'active' : ''}"
+								@click=${() => this.#setTheme(val)}
+							>
+								${val[0].toUpperCase() + val.slice(1)}
+							</button>
+						`,
+					)}
+				</div>
+			</div>
+			<div class="setting-row">
+				<span class="setting-label">Panel on load</span>
+				<div class="segmented-control">
+					${(['open', 'closed', 'remember'] as const).map(
+						(val) => html`
+							<button
+								class="segment ${this._panelState === val ? 'active' : ''}"
+								@click=${() => this.#setPanelState(val)}
+							>
+								${val[0].toUpperCase() + val.slice(1)}
+							</button>
+						`,
+					)}
+				</div>
+			</div>
+		`;
+	}
+
+	#renderNetworksContent() {
 		if (!this.wallet) return nothing;
 
 		const networks = this.wallet.availableNetworks;
@@ -417,7 +645,6 @@ export class DevWalletSettings extends LitElement {
 		const urls = this.wallet.networkUrls;
 
 		return html`
-			<h3 class="section-header">Networks</h3>
 			<div class="network-list">
 				${networks.map((name) => {
 					const color = NETWORK_COLORS[name] ?? '#888';
@@ -429,23 +656,23 @@ export class DevWalletSettings extends LitElement {
 							<div class="network-info">
 								<div class="network-name-row">
 									<span class="network-name">${name}</span>
-									${isActive
-										? html`<span class="network-active-badge">Active</span>`
-										: nothing}
+									${isActive ? html`<span class="network-active-badge">Active</span>` : nothing}
 								</div>
 								${isEditing
 									? html`<input
-											class="network-url-input"
-											type="text"
-											.value=${this._editingUrl}
-											@input=${(e: InputEvent) => {
-												this._editingUrl = (e.target as HTMLInputElement).value;
-											}}
-											@keydown=${(e: KeyboardEvent) => {
-												if (e.key === 'Enter') this.#saveNetworkUrl(name);
-												if (e.key === 'Escape') this.#cancelEditNetwork();
-											}}
-										/>`
+												class="network-url-input"
+												type="text"
+												.value=${this._editingUrl}
+												@input=${(e: InputEvent) => {
+													this._editingUrl = (e.target as HTMLInputElement).value;
+													this._error = null;
+												}}
+												@keydown=${(e: KeyboardEvent) => {
+													if (e.key === 'Enter') this.#saveNetworkUrl(name);
+													if (e.key === 'Escape') this.#cancelEditNetwork();
+												}}
+											/>
+											${this._error ? html`<div class="error">${this._error}</div>` : nothing}`
 									: html`<span class="network-url" title=${urls[name] ?? ''}
 											>${urls[name] ?? ''}</span
 										>`}
@@ -459,7 +686,16 @@ export class DevWalletSettings extends LitElement {
 												aria-label="Save URL"
 												@click=${() => this.#saveNetworkUrl(name)}
 											>
-												<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
+												<svg
+													viewBox="0 0 24 24"
+													width="14"
+													height="14"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2.5"
+												>
+													<path d="M20 6L9 17l-5-5" />
+												</svg>
 											</button>
 											<button
 												class="btn-icon"
@@ -467,7 +703,16 @@ export class DevWalletSettings extends LitElement {
 												aria-label="Cancel editing"
 												@click=${this.#cancelEditNetwork}
 											>
-												<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+												<svg
+													viewBox="0 0 24 24"
+													width="14"
+													height="14"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2.5"
+												>
+													<path d="M18 6L6 18M6 6l12 12" />
+												</svg>
 											</button>
 										`
 									: html`
@@ -477,7 +722,16 @@ export class DevWalletSettings extends LitElement {
 												aria-label="Edit network URL"
 												@click=${() => this.#startEditNetwork(name, urls[name] ?? '')}
 											>
-												<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+												<svg
+													viewBox="0 0 24 24"
+													width="14"
+													height="14"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="2"
+												>
+													<path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5Z" />
+												</svg>
 											</button>
 											${!isActive
 												? html`<button
@@ -486,7 +740,16 @@ export class DevWalletSettings extends LitElement {
 														aria-label="Remove network"
 														@click=${() => this.#removeNetwork(name)}
 													>
-														<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+														<svg
+															viewBox="0 0 24 24"
+															width="14"
+															height="14"
+															fill="none"
+															stroke="currentColor"
+															stroke-width="2.5"
+														>
+															<path d="M18 6L6 18M6 6l12 12" />
+														</svg>
 													</button>`
 												: nothing}
 										`}
@@ -556,59 +819,89 @@ export class DevWalletSettings extends LitElement {
 		return this.adapters.some((a) => a.id === 'remote-cli');
 	}
 
-	#renderCliSigner() {
+	#isCliConnected(): boolean {
+		const cliAdapter = this.adapters.find((a) => a.id === 'remote-cli');
+		if (!cliAdapter) return false;
+		return 'isPaired' in cliAdapter && (cliAdapter as { isPaired: boolean }).isPaired;
+	}
+
+	#getCliStatusLabel(): string {
+		return this.#isCliConnected() ? 'Connected' : 'Not connected';
+	}
+
+	#renderCliContent() {
 		const cliAdapter = this.adapters.find((a) => a.id === 'remote-cli');
 		if (!cliAdapter) return nothing;
 
-		const isPaired = 'isPaired' in cliAdapter && (cliAdapter as { isPaired: boolean }).isPaired;
+		const isPaired = this.#isCliConnected();
 		const cliAccounts = cliAdapter.getAccounts();
 
-		return html`
-			<h3 class="section-header">CLI Signer</h3>
-			${isPaired
-				? html`
-						<div class="network-item active cli-section-column">
-							<div class="cli-header-row">
-								<span
-									class="network-dot"
-									style="background: var(--dev-wallet-status-connected)"
-								></span>
-								<span class="network-name">Connected</span>
-								${cliAccounts.length > 0
-									? html`<span class="network-active-badge">${cliAccounts.length} imported</span>`
-									: nothing}
-							</div>
-							${cliAccounts.length > 0
-								? html`<div class="cli-accounts-list">
-										${cliAccounts.map(
-											(acc) => html`
-												<div class="network-url">${acc.label} (${formatAddress(acc.address)})</div>
-											`,
-										)}
-									</div>`
-								: html`<div class="about cli-hint">Use + Add above to import CLI accounts.</div>`}
-						</div>
-					`
-				: html`
-						<div class="network-item">
+		return isPaired
+			? html`
+					<div class="network-item active cli-section-column">
+						<div class="cli-header-row">
 							<span
 								class="network-dot"
-								style="background: var(--dev-wallet-status-disconnected)"
+								style="background: var(--dev-wallet-status-connected)"
 							></span>
-							<span class="network-name" style="color: var(--dev-wallet-muted-foreground)"
-								>Not connected</span
-							>
+							<span class="network-name">Connected</span>
+							${cliAccounts.length > 0
+								? html`<span class="network-active-badge">${cliAccounts.length} imported</span>`
+								: nothing}
 						</div>
-						<div class="about cli-unpaired-hint">
-							Open the token URL from your terminal to connect CLI accounts.
-						</div>
-					`}
-		`;
+						${cliAccounts.length > 0
+							? html`<div class="cli-accounts-list">
+									${cliAccounts.map(
+										(acc) => html`
+											<div class="network-url">${acc.label} (${formatAddress(acc.address)})</div>
+										`,
+									)}
+								</div>`
+							: html`<div class="about cli-hint">Use + Add above to import CLI accounts.</div>`}
+					</div>
+				`
+			: html`
+					<div class="network-item">
+						<span
+							class="network-dot"
+							style="background: var(--dev-wallet-status-disconnected)"
+						></span>
+						<span class="network-name" style="color: var(--dev-wallet-muted-foreground)"
+							>Not connected</span
+						>
+					</div>
+					<div class="about cli-unpaired-hint">
+						Open the token URL from your terminal to connect CLI accounts.
+					</div>
+				`;
 	}
 
-	#renderAccounts() {
+	#canAddAccounts(): boolean {
+		return this.adapters.some(
+			(a) =>
+				('createAccount' in a && a.createAccount) ||
+				('importAccount' in a &&
+					a.importAccount &&
+					'listAvailableAccounts' in a &&
+					a.listAvailableAccounts),
+		);
+	}
+
+	async #openAddAccountDialog() {
+		if (!this._expandedSections.has('accounts')) {
+			this.#toggleSection('accounts');
+		}
+		await this.updateComplete;
+		const el = this.shadowRoot?.querySelector('dev-wallet-accounts') as HTMLElement & {
+			openAddDialog?: () => void;
+		};
+		el?.openAddDialog?.();
+	}
+
+	#renderAccountsContent() {
 		return html`
 			<dev-wallet-accounts
+				hide-header
 				exportparts="account-list: accounts-account-list, add-button: accounts-add-button, empty-state: accounts-empty-state"
 				.accounts=${this.accounts}
 				.adapters=${this.adapters}
@@ -617,16 +910,13 @@ export class DevWalletSettings extends LitElement {
 		`;
 	}
 
-	#renderBookmarklet() {
-		if (!this.bookmarkletOrigin) return nothing;
+	#renderBookmarkletContent() {
 		const origin = this.bookmarkletOrigin;
-
 		const bookmarkletJs = `${origin}/bookmarklet.js`;
 		const bookmarkletHref = `javascript:void(document.head.appendChild(Object.assign(document.createElement('script'),{src:'${bookmarkletJs}'})))`;
 		const consoleSnippet = `var s=document.createElement('script');s.src='${bookmarkletJs}';document.head.appendChild(s);`;
 
 		return html`
-			<h3 class="section-header">Bookmarklet</h3>
 			<div class="about">
 				Drag this link to your bookmarks bar, then click it on any dApp to inject the wallet:
 			</div>
@@ -640,7 +930,7 @@ export class DevWalletSettings extends LitElement {
 					Dev Wallet
 				</a>
 			</div>
-			<div class="about" style="margin-top: 12px">Or paste this in the browser console:</div>
+			<div class="about" style="margin-top: 10px">Or paste in the browser console:</div>
 			<div class="console-snippet">
 				${consoleSnippet}
 				<button class="btn-copy" @click=${() => this.#copySnippet(consoleSnippet)}>
@@ -663,65 +953,8 @@ export class DevWalletSettings extends LitElement {
 		});
 	}
 
-	#renderPreferences() {
+	#renderAboutContent() {
 		return html`
-			<h3 class="section-header">Preferences</h3>
-			<div class="setting-row">
-				<span class="setting-label">Theme</span>
-				<div class="segmented-control">
-					${(['system', 'light', 'dark'] as const).map(
-						(val) => html`
-							<button
-								class="segment ${this._theme === val ? 'active' : ''}"
-								@click=${() => this.#setTheme(val)}
-							>
-								${val[0].toUpperCase() + val.slice(1)}
-							</button>
-						`,
-					)}
-				</div>
-			</div>
-			<div class="setting-row">
-				<span class="setting-label">Panel on load</span>
-				<div class="segmented-control">
-					${(['open', 'closed', 'remember'] as const).map(
-						(val) => html`
-							<button
-								class="segment ${this._panelState === val ? 'active' : ''}"
-								@click=${() => this.#setPanelState(val)}
-							>
-								${val[0].toUpperCase() + val.slice(1)}
-							</button>
-						`,
-					)}
-				</div>
-			</div>
-		`;
-	}
-
-	#setTheme(value: 'system' | 'light' | 'dark') {
-		this._theme = value;
-		try {
-			localStorage.setItem('dev-wallet:theme', value);
-		} catch {
-			// ignore
-		}
-		emitEvent(this, 'setting-changed', { key: 'theme', value });
-	}
-
-	#setPanelState(value: 'open' | 'closed' | 'remember') {
-		this._panelState = value;
-		try {
-			localStorage.setItem('dev-wallet:panel-state', value);
-		} catch {
-			// ignore
-		}
-		emitEvent(this, 'setting-changed', { key: 'panel-state', value });
-	}
-
-	#renderAbout() {
-		return html`
-			<h3 class="section-header">About</h3>
 			<div class="about">
 				<strong>${this.wallet?.name ?? 'Dev Wallet'}</strong><br />
 				A development wallet for testing Sui dApps.<br />
@@ -732,6 +965,8 @@ export class DevWalletSettings extends LitElement {
 			</div>
 		`;
 	}
+
+	/* -- Business logic ------------------------------------------------- */
 
 	#addNetwork() {
 		if (!this.wallet) return;
@@ -787,11 +1022,32 @@ export class DevWalletSettings extends LitElement {
 	#cancelEditNetwork() {
 		this._editingNetwork = null;
 		this._editingUrl = '';
+		this._error = null;
 	}
 
 	#removeNetwork(name: string) {
 		if (!this.wallet) return;
 		this.wallet.removeNetwork(name);
+	}
+
+	#setTheme(value: 'system' | 'light' | 'dark') {
+		this._theme = value;
+		try {
+			localStorage.setItem('dev-wallet:theme', value);
+		} catch {
+			// ignore
+		}
+		emitEvent(this, 'setting-changed', { key: 'theme', value });
+	}
+
+	#setPanelState(value: 'open' | 'closed' | 'remember') {
+		this._panelState = value;
+		try {
+			localStorage.setItem('dev-wallet:panel-state', value);
+		} catch {
+			// ignore
+		}
+		emitEvent(this, 'setting-changed', { key: 'panel-state', value });
 	}
 }
 
