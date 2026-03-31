@@ -297,11 +297,24 @@ export class WalletController implements ReactiveController {
 		`;
 	}
 
+	// Track which tabs have been visited so we only mount them once,
+	// then keep them alive (hidden) to avoid re-fetching data on tab switch.
+	#visitedTabs = new Set<TabId>(['assets']);
+
 	renderTabContent() {
-		if (this.activeTab === 'assets') return this.renderAssetsTab();
-		if (this.activeTab === 'objects') return this.renderObjectsTab();
-		if (this.activeTab === 'settings') return this.renderSettingsTab();
-		return nothing;
+		this.#visitedTabs.add(this.activeTab);
+
+		return html`
+			<div style="display:${this.activeTab === 'assets' ? 'block' : 'none'}">
+				${this.#visitedTabs.has('assets') ? this.renderAssetsTab() : nothing}
+			</div>
+			<div style="display:${this.activeTab === 'objects' ? 'block' : 'none'}">
+				${this.#visitedTabs.has('objects') ? this.renderObjectsTab() : nothing}
+			</div>
+			<div style="display:${this.activeTab === 'settings' ? 'block' : 'none'}">
+				${this.#visitedTabs.has('settings') ? this.renderSettingsTab() : nothing}
+			</div>
+		`;
 	}
 
 	renderSigningModal() {
