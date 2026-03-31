@@ -58,6 +58,8 @@ const themeStyles = css`
 		--dev-wallet-ring: #00b2ff;
 		--dev-wallet-status-connected: #00bc7e;
 		--dev-wallet-status-disconnected: rgba(255, 255, 255, 0.3);
+		--dev-wallet-hover: rgba(255, 255, 255, 0.06);
+		--dev-wallet-active: rgba(255, 255, 255, 0.1);
 
 		/* Radius */
 		--dev-wallet-radius: 12px;
@@ -91,6 +93,33 @@ const themeStyles = css`
 
 		letter-spacing: -0.01em;
 	}
+
+	/* Light theme */
+	:host([theme='light']) {
+		--dev-wallet-background: #f7f7f5;
+		--dev-wallet-foreground: #1a1a1a;
+		--dev-wallet-primary: #00b2ff;
+		--dev-wallet-primary-foreground: #ffffff;
+		--dev-wallet-secondary: #f0efed;
+		--dev-wallet-secondary-foreground: #1a1a1a;
+		--dev-wallet-muted: #f0efed;
+		--dev-wallet-muted-foreground: rgba(0, 0, 0, 0.4);
+		--dev-wallet-tertiary: rgba(0, 0, 0, 0.25);
+		--dev-wallet-destructive: #ff2b3a;
+		--dev-wallet-positive: #00bc7e;
+		--dev-wallet-warning: #ff9905;
+		--dev-wallet-border: rgba(0, 0, 0, 0.06);
+		--dev-wallet-border-med: rgba(0, 0, 0, 0.08);
+		--dev-wallet-input: rgba(0, 0, 0, 0.06);
+		--dev-wallet-ring: #00b2ff;
+		--dev-wallet-status-connected: #00bc7e;
+		--dev-wallet-status-disconnected: rgba(0, 0, 0, 0.25);
+		--dev-wallet-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+		--dev-wallet-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+		--dev-wallet-shadow-lg: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.12);
+		--dev-wallet-hover: rgba(0, 0, 0, 0.04);
+		--dev-wallet-active: rgba(0, 0, 0, 0.07);
+	}
 `;
 
 export const dropdownItemStyles = css`
@@ -107,7 +136,7 @@ export const dropdownItemStyles = css`
 	}
 
 	.dropdown-item:hover {
-		background: rgba(255, 255, 255, 0.06);
+		background: var(--dev-wallet-hover);
 	}
 
 	.dropdown-item[aria-selected='true'] {
@@ -191,22 +220,21 @@ export const actionBarStyles = css`
 	}
 
 	.action-btn {
-		padding: 8px 22px;
+		padding: 9px 22px;
 		border-radius: 999px;
 		font-size: 13px;
 		font-weight: var(--dev-wallet-font-weight-medium);
 		color: var(--dev-wallet-foreground);
-		background: rgba(255, 255, 255, 0.08);
-		border: 1px solid rgba(255, 255, 255, 0.1);
+		background: var(--dev-wallet-active);
 		transition: background 0.15s;
 	}
 
 	.action-btn:hover {
-		background: rgba(255, 255, 255, 0.12);
+		filter: brightness(0.9);
 	}
 
 	.action-btn:disabled {
-		opacity: 0.3;
+		opacity: 0.5;
 		cursor: not-allowed;
 	}
 
@@ -384,6 +412,229 @@ export const sectionHeaderStyles = css`
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 		margin-bottom: 8px;
+	}
+`;
+
+export const settingsToggleStyles = css`
+	.setting-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 14px 0;
+		border-bottom: 1px solid var(--dev-wallet-border);
+	}
+
+	.setting-row:last-child {
+		border-bottom: none;
+	}
+
+	.setting-label {
+		font-size: 14px;
+		font-weight: var(--dev-wallet-font-weight-medium);
+		color: var(--dev-wallet-foreground);
+	}
+
+	.segmented-control {
+		display: inline-flex;
+		padding: 3px;
+		border-radius: var(--dev-wallet-radius-sm);
+		background: var(--dev-wallet-secondary);
+		gap: 2px;
+	}
+
+	.segment {
+		padding: 5px 12px;
+		border-radius: var(--dev-wallet-radius-xs);
+		font-size: 12px;
+		font-weight: var(--dev-wallet-font-weight-medium);
+		color: var(--dev-wallet-muted-foreground);
+		transition: all 0.15s;
+		white-space: nowrap;
+	}
+
+	.segment:hover {
+		color: var(--dev-wallet-foreground);
+	}
+
+	.segment.active {
+		background: var(--dev-wallet-background);
+		color: var(--dev-wallet-foreground);
+		box-shadow: var(--dev-wallet-shadow-sm);
+	}
+`;
+
+export const balanceDetailStyles = css`
+	.balance-detail {
+		padding: 0;
+	}
+
+	.detail-back {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 13px;
+		color: var(--dev-wallet-muted-foreground);
+		margin-bottom: 20px;
+	}
+
+	.detail-back:hover {
+		color: var(--dev-wallet-foreground);
+	}
+
+	.detail-back svg {
+		width: 16px;
+		height: 16px;
+	}
+
+	.detail-hero {
+		text-align: center;
+		margin-bottom: 20px;
+	}
+
+	.detail-amount {
+		font-size: 28px;
+		font-weight: var(--dev-wallet-font-weight-semibold);
+		color: var(--dev-wallet-foreground);
+		font-family: var(--dev-wallet-font-mono);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.detail-symbol {
+		font-size: 16px;
+		font-weight: var(--dev-wallet-font-weight-medium);
+		color: var(--dev-wallet-muted-foreground);
+		margin-left: 6px;
+	}
+
+	.detail-coin-type {
+		font-size: 12px;
+		font-family: var(--dev-wallet-font-mono);
+		color: var(--dev-wallet-tertiary);
+		margin-top: 4px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.detail-actions {
+		display: flex;
+		justify-content: center;
+		gap: 8px;
+		margin-bottom: 24px;
+	}
+
+	.detail-section-label {
+		font-size: 11px;
+		font-weight: var(--dev-wallet-font-weight-semibold);
+		color: var(--dev-wallet-tertiary);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		margin-bottom: 6px;
+	}
+
+	.detail-address-row {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.detail-address {
+		font-size: 13px;
+		font-family: var(--dev-wallet-font-mono);
+		color: var(--dev-wallet-muted-foreground);
+		flex: 1;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	/* -- Send form ---------------------------------------------------- */
+
+	.send-form {
+		margin-top: 20px;
+	}
+
+	.send-field {
+		margin-bottom: 12px;
+	}
+
+	.send-label {
+		display: block;
+		font-size: 12px;
+		font-weight: var(--dev-wallet-font-weight-medium);
+		color: var(--dev-wallet-muted-foreground);
+		margin-bottom: 4px;
+	}
+
+	.send-input {
+		width: 100%;
+		padding: 10px 12px;
+		border-radius: var(--dev-wallet-radius-sm);
+		border: 1px solid var(--dev-wallet-border-med);
+		background: var(--dev-wallet-secondary);
+		color: var(--dev-wallet-foreground);
+		font-size: 14px;
+		font-family: inherit;
+		outline: none;
+		box-sizing: border-box;
+	}
+
+	.send-input:focus {
+		border-color: var(--dev-wallet-primary);
+	}
+
+	.send-input::placeholder {
+		color: var(--dev-wallet-tertiary);
+	}
+
+	.send-actions {
+		display: flex;
+		gap: 8px;
+		margin-top: 16px;
+	}
+
+	.send-btn {
+		flex: 1;
+		padding: 10px;
+		border-radius: 999px;
+		font-size: 13px;
+		font-weight: var(--dev-wallet-font-weight-semibold);
+	}
+
+	.send-btn-primary {
+		background: var(--dev-wallet-primary);
+		color: var(--dev-wallet-primary-foreground);
+	}
+
+	.send-btn-primary:disabled {
+		opacity: 0.4;
+		cursor: not-allowed;
+	}
+
+	.send-btn-primary:not(:disabled):hover {
+		filter: brightness(0.9);
+	}
+
+	.send-btn-cancel {
+		background: transparent;
+		color: var(--dev-wallet-muted-foreground);
+	}
+
+	.send-btn-cancel:hover {
+		color: var(--dev-wallet-foreground);
+	}
+
+	.send-error {
+		font-size: 12px;
+		color: var(--dev-wallet-destructive);
+		margin-top: 8px;
+	}
+
+	.send-success {
+		text-align: center;
+		padding: 20px;
+		font-size: 14px;
+		color: var(--dev-wallet-positive);
+		font-weight: var(--dev-wallet-font-weight-medium);
 	}
 `;
 

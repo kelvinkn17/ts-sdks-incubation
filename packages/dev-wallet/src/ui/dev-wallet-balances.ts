@@ -11,6 +11,7 @@ import { formatCoinBalance, getCoinSymbol } from './utils.js';
 interface CoinBalance {
 	coinType: string;
 	symbol: string;
+	coinName: string;
 	totalBalance: string;
 	decimals: number;
 }
@@ -29,29 +30,45 @@ export class DevWalletBalances extends LitElement {
 			.balance-list {
 				display: flex;
 				flex-direction: column;
+				gap: 8px;
 			}
 
 			.balance-item {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
-				padding: 12px 0;
-				border-bottom: 1px solid var(--dev-wallet-border);
+				padding: 14px 16px;
+				border-radius: var(--dev-wallet-radius);
+				background: var(--dev-wallet-secondary);
+				cursor: pointer;
+				transition: background 0.15s;
 			}
 
-			.balance-item:last-child {
-				border-bottom: none;
+			.balance-item:hover {
+				background: var(--dev-wallet-active);
+			}
+
+			.balance-left {
+				display: flex;
+				flex-direction: column;
+				gap: 2px;
 			}
 
 			.balance-symbol {
-				font-size: 13px;
-				font-weight: var(--dev-wallet-font-weight-medium);
+				font-size: 15px;
+				font-weight: var(--dev-wallet-font-weight-semibold);
 				color: var(--dev-wallet-foreground);
 			}
 
-			.balance-amount {
-				font-size: 13px;
+			.balance-coin-name {
+				font-size: 12px;
 				color: var(--dev-wallet-muted-foreground);
+			}
+
+			.balance-amount {
+				font-size: 16px;
+				font-weight: var(--dev-wallet-font-weight-medium);
+				color: var(--dev-wallet-foreground);
 				font-family: var(--dev-wallet-font-mono);
 				font-variant-numeric: tabular-nums;
 			}
@@ -84,6 +101,16 @@ export class DevWalletBalances extends LitElement {
 		}
 	}
 
+	#selectBalance(balance: CoinBalance) {
+		this.dispatchEvent(
+			new CustomEvent('balance-selected', {
+				bubbles: true,
+				composed: true,
+				detail: { balance },
+			}),
+		);
+	}
+
 	override willUpdate(changedProperties: Map<string, unknown>) {
 		if (
 			(changedProperties.has('address') || changedProperties.has('client')) &&
@@ -114,8 +141,11 @@ export class DevWalletBalances extends LitElement {
 								<div class="balance-list" part="balance-list">
 									${this._balances.map(
 										(balance) => html`
-											<div class="balance-item">
-												<span class="balance-symbol">${balance.symbol}</span>
+											<div class="balance-item" @click=${() => this.#selectBalance(balance)}>
+												<div class="balance-left">
+													<span class="balance-symbol">${balance.symbol}</span>
+													<span class="balance-coin-name">${balance.coinName}</span>
+												</div>
 												<span class="balance-amount"
 													>${formatCoinBalance(balance.totalBalance, balance.decimals)}</span
 												>
@@ -150,6 +180,7 @@ export class DevWalletBalances extends LitElement {
 				(b, i): CoinBalance => ({
 					coinType: b.coinType,
 					symbol: metadataResults[i]?.coinMetadata?.symbol ?? getCoinSymbol(b.coinType),
+					coinName: metadataResults[i]?.coinMetadata?.name ?? getCoinSymbol(b.coinType),
 					totalBalance: b.balance,
 					decimals: metadataResults[i]?.coinMetadata?.decimals ?? 0,
 				}),

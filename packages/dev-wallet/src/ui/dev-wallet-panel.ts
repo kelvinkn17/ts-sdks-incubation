@@ -5,7 +5,12 @@ import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
 import type { DevWallet } from '../wallet/dev-wallet.js';
-import { actionBarStyles, connectDialogStyles, sharedStyles } from './styles.js';
+import {
+	actionBarStyles,
+	balanceDetailStyles,
+	connectDialogStyles,
+	sharedStyles,
+} from './styles.js';
 import { WalletController } from './wallet-controller.js';
 
 @customElement('dev-wallet-panel')
@@ -14,6 +19,7 @@ export class DevWalletPanel extends LitElement {
 		sharedStyles,
 		connectDialogStyles,
 		actionBarStyles,
+		balanceDetailStyles,
 		css`
 			:host {
 				display: block;
@@ -63,33 +69,38 @@ export class DevWalletPanel extends LitElement {
 
 			.sidebar-header {
 				display: flex;
-				justify-content: space-between;
 				align-items: center;
-				padding: 16px 20px;
+				padding: 14px 16px;
 				border-bottom: 1px solid var(--dev-wallet-border);
 				position: relative;
 				z-index: 1;
+				gap: 10px;
 			}
 
 			.sidebar-title {
-				font-size: 16px;
+				font-size: 14px;
 				font-weight: var(--dev-wallet-font-weight-semibold);
 				color: var(--dev-wallet-foreground);
 			}
 
+			.header-spacer {
+				flex: 1;
+			}
+
 			.close-btn {
 				font-size: 18px;
-				color: var(--dev-wallet-muted-foreground);
-				width: 30px;
-				height: 30px;
+				color: var(--dev-wallet-tertiary);
+				width: 28px;
+				height: 28px;
 				display: flex;
 				align-items: center;
 				justify-content: center;
 				border-radius: var(--dev-wallet-radius-xs);
+				flex-shrink: 0;
 			}
 
 			.close-btn:hover {
-				background: var(--dev-wallet-secondary);
+				color: var(--dev-wallet-foreground);
 			}
 
 			.sidebar-body {
@@ -118,6 +129,20 @@ export class DevWalletPanel extends LitElement {
 
 	#ctrl = new WalletController(this);
 	#hadPendingRequest = false;
+	#mediaQuery: MediaQueryList | null = null;
+
+	override connectedCallback() {
+		super.connectedCallback();
+		this.#applyTheme();
+		this.#applyPanelState();
+		this.addEventListener('setting-changed', this.#onSettingChanged as EventListener);
+	}
+
+	override disconnectedCallback() {
+		super.disconnectedCallback();
+		this.removeEventListener('setting-changed', this.#onSettingChanged as EventListener);
+		this.#mediaQuery?.removeEventListener('change', this.#onSystemThemeChange);
+	}
 
 	override willUpdate(changedProperties: Map<string, unknown>) {
 		if (changedProperties.has('wallet')) {
@@ -168,6 +193,7 @@ export class DevWalletPanel extends LitElement {
 				<div class="sidebar-header">
 					<span class="sidebar-title">${this.wallet?.name ?? 'Dev Wallet'}</span>
 					${this.#ctrl.renderNetworkBadge()}
+					<span class="header-spacer"></span>
 					<button
 						class="close-btn"
 						part="close-button"
@@ -196,6 +222,61 @@ export class DevWalletPanel extends LitElement {
 		this._isOpen = !this._isOpen;
 		if (this._isOpen) {
 			this.#ctrl.syncState();
+		}
+		// Persist state if preference is 'remember'
+		try {
+			if (localStorage.getItem('dev-wallet:panel-state') === 'remember') {
+				localStorage.setItem('dev-wallet:panel-last-state', this._isOpen ? 'open' : 'closed');
+			}
+		} catch {
+			// ignore
+		}
+	}
+
+	#onSettingChanged = (e: Event) => {
+		const detail = (e as CustomEvent).detail;
+		if (detail?.key === 'theme') this.#applyTheme();
+		if (detail?.key === 'panel-state') this.#applyPanelState();
+	};
+
+	#onSystemThemeChange = () => {
+		this.#applyTheme();
+	};
+
+	#applyTheme() {
+		let pref: string | null = null;
+		try {
+			pref = localStorage.getItem('dev-wallet:theme');
+		} catch {
+			// ignore
+		}
+
+		this.#mediaQuery?.removeEventListener('change', this.#onSystemThemeChange);
+
+		if (pref === 'light') {
+			this.setAttribute('theme', 'light');
+		} else if (pref === 'system') {
+			this.#mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
+			this.#mediaQuery.addEventListener('change', this.#onSystemThemeChange);
+			this.setAttribute('theme', this.#mediaQuery.matches ? 'light' : 'dark');
+		} else {
+			this.removeAttribute('theme');
+		}
+	}
+
+	#applyPanelState() {
+		try {
+			const pref = localStorage.getItem('dev-wallet:panel-state');
+			if (pref === 'open') {
+				this._isOpen = true;
+			} else if (pref === 'closed') {
+				this._isOpen = false;
+			} else if (pref === 'remember') {
+				this._isOpen = localStorage.getItem('dev-wallet:panel-last-state') !== 'closed';
+			}
+			// default (null) = open
+		} catch {
+			// ignore
 		}
 	}
 }

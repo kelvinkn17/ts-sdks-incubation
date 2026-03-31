@@ -2,14 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { ClientWithCoreApi } from '@mysten/sui/client';
-import { getFaucetHost, requestSuiFromFaucetV2 } from '@mysten/sui/faucet';
 import type { ReadonlyWalletAccount } from '@mysten/wallet-standard';
 import { html, nothing } from 'lit';
 import type { ReactiveController, ReactiveControllerHost } from 'lit';
 
 import { getNetworkFromChain } from '../wallet/constants.js';
 import { CopyController } from './copy-controller.js';
-import { formatAddress } from './utils.js';
+import { formatCoinBalance } from './utils.js';
 import type {
 	DevWallet,
 	PendingConnectRequest,
@@ -45,16 +44,34 @@ export class WalletController implements ReactiveController {
 	faucetLoading = false;
 	faucetError: string | null = null;
 	showReceive = false;
+	selectedBalance: {
+		coinType: string;
+		symbol: string;
+		coinName: string;
+		totalBalance: string;
+		decimals: number;
+	} | null = null;
+	showSendForm = false;
+	sendRecipient = '';
+	sendAmount = '';
+	sendLoading = false;
+	sendError: string | null = null;
+	sendSuccess = false;
 
 	#wallet: DevWallet | null = null;
 	#unsubscribeEvents: (() => void) | null = null;
 	#unsubscribeRequests: (() => void) | null = null;
 	#unsubscribeConnect: (() => void) | null = null;
-	#copy = new CopyController({ requestUpdate: () => this.host.requestUpdate() } as any);
+	#copy: CopyController | null = null;
 
 	constructor(host: ReactiveControllerHost) {
 		this.host = host;
 		host.addController(this);
+		this.#copy = new CopyController(host);
+	}
+
+	get #copyCtrl(): CopyController {
+		return this.#copy!;
 	}
 
 	get wallet(): DevWallet | null {
@@ -209,6 +226,8 @@ export class WalletController implements ReactiveController {
 	}
 
 	renderAssetsTab() {
+		if (this.selectedBalance) return this.#renderBalanceDetail();
+
 		const canFaucet =
 			this.#wallet?.activeNetwork === 'testnet' || this.#wallet?.activeNetwork === 'devnet';
 
@@ -216,17 +235,6 @@ export class WalletController implements ReactiveController {
 			${this.renderAccountSelector()}
 			${this.activeAddress
 				? html`
-						<div class="address-bar">
-							<span class="address-text">${formatAddress(this.activeAddress)}</span>
-							<button
-								class="address-copy-btn ${this.#copy.isCopied(this.activeAddress) ? 'copied' : ''}"
-								title="Copy address"
-								aria-label="Copy address"
-								@click=${() => this.#copy.copy(this.activeAddress)}
-							>
-								${this.#copy.isCopied(this.activeAddress) ? '\u2713' : '\u2398'}
-							</button>
-						</div>
 						<div class="action-buttons">
 							${canFaucet
 								? html`<button
@@ -238,7 +246,7 @@ export class WalletController implements ReactiveController {
 									</button>`
 								: nothing}
 							<button class="action-btn" @click=${() => this.#openReceive()}>Receive</button>
-							<button class="action-btn" disabled title="Coming soon">Send</button>
+							<button class="action-btn" @click=${() => this.#openSendFromHome()}>Send</button>
 						</div>
 						${this.faucetError
 							? html`<div class="action-error">${this.faucetError}</div>`
@@ -253,6 +261,10 @@ export class WalletController implements ReactiveController {
 								exportparts="balance-list, loading: balances-loading, error-message: balances-error-message, empty-state: balances-empty-state"
 								.address=${this.activeAddress}
 								.client=${this.getActiveClient()}
+								@balance-selected=${(e: CustomEvent) => {
+									this.selectedBalance = e.detail.balance;
+									this.host.requestUpdate();
+								}}
 							></dev-wallet-balances>
 						</div>
 					`
@@ -370,6 +382,7 @@ export class WalletController implements ReactiveController {
 		this.host.requestUpdate();
 
 		try {
+			const { requestSuiFromFaucetV2, getFaucetHost } = await import('@mysten/sui/faucet');
 			await requestSuiFromFaucetV2({
 				host: getFaucetHost(network),
 				recipient: this.activeAddress,
@@ -404,15 +417,234 @@ export class WalletController implements ReactiveController {
 					<div class="receive-title">Receive</div>
 					<div class="receive-address">${this.activeAddress}</div>
 					<button
-						class="receive-copy-btn ${this.#copy.isCopied(this.activeAddress) ? 'copied' : ''}"
-						@click=${() => this.#copy.copy(this.activeAddress)}
+						class="receive-copy-btn ${this.#copyCtrl.isCopied(this.activeAddress) ? 'copied' : ''}"
+						@click=${() => this.#copyCtrl.copy(this.activeAddress)}
 					>
-						${this.#copy.isCopied(this.activeAddress) ? 'Copied!' : 'Copy Address'}
+						${this.#copyCtrl.isCopied(this.activeAddress) ? 'Copied!' : 'Copy Address'}
 					</button>
 					<button class="receive-close" @click=${() => this.#closeReceive()}>Close</button>
 				</div>
 			</div>
 		`;
+	}
+
+	// ── Balance detail + send ───────────────────────────────────────────────
+
+	#renderBalanceDetail() {
+		const bal = this.selectedBalance!;
+		const formatted = formatCoinBalance(bal.totalBalance, bal.decimals);
+
+		if (this.showSendForm) return this.#renderSendForm(bal);
+
+		return html`
+			<div class="balance-detail">
+				<button class="detail-back" @click=${() => this.#closeBalanceDetail()}>
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M19 12H5M12 19l-7-7 7-7" />
+					</svg>
+					Back
+				</button>
+				<div class="detail-hero">
+					<span class="detail-amount">${formatted}</span>
+					<span class="detail-symbol">${bal.symbol}</span>
+					<div class="detail-coin-type">${bal.coinType}</div>
+				</div>
+				<div class="detail-actions">
+					<button class="action-btn" @click=${() => this.#openReceive()}>Receive</button>
+					<button class="action-btn" @click=${() => this.#openSendForm()}>Send</button>
+				</div>
+				<div class="detail-section-label">Address</div>
+				<div class="detail-address-row">
+					<span class="detail-address">${this.activeAddress}</span>
+					<button
+						class="address-copy-btn ${this.#copyCtrl.isCopied(this.activeAddress) ? 'copied' : ''}"
+						@click=${() => this.#copyCtrl.copy(this.activeAddress)}
+					>
+						${this.#copyCtrl.isCopied(this.activeAddress) ? '\u2713' : '\u2398'}
+					</button>
+				</div>
+			</div>
+			${this.showReceive ? this.#renderReceiveOverlay() : nothing}
+		`;
+	}
+
+	#closeBalanceDetail() {
+		this.selectedBalance = null;
+		this.showSendForm = false;
+		this.sendError = null;
+		this.sendSuccess = false;
+		this.host.requestUpdate();
+	}
+
+	#openSendFromHome() {
+		// Default to SUI for quick send from home
+		this.selectedBalance = {
+			coinType: '0x2::sui::SUI',
+			symbol: 'SUI',
+			coinName: 'Sui',
+			totalBalance: '0',
+			decimals: 9,
+		};
+		this.showSendForm = true;
+		this.sendRecipient = '';
+		this.sendAmount = '';
+		this.sendError = null;
+		this.sendSuccess = false;
+		this.host.requestUpdate();
+	}
+
+	#openSendForm() {
+		this.showSendForm = true;
+		this.sendRecipient = '';
+		this.sendAmount = '';
+		this.sendError = null;
+		this.sendSuccess = false;
+		this.host.requestUpdate();
+	}
+
+	#renderSendForm(bal: NonNullable<typeof this.selectedBalance>) {
+		if (this.sendSuccess) {
+			return html`
+				<div class="balance-detail">
+					<div class="send-success">Transaction sent successfully</div>
+					<div class="send-actions">
+						<button class="send-btn send-btn-primary" @click=${() => this.#closeBalanceDetail()}>
+							Done
+						</button>
+					</div>
+				</div>
+			`;
+		}
+
+		return html`
+			<div class="balance-detail">
+				<button class="detail-back" @click=${() => {
+					this.showSendForm = false;
+					this.host.requestUpdate();
+				}}>
+					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M19 12H5M12 19l-7-7 7-7" />
+					</svg>
+					Back
+				</button>
+				<div class="detail-hero" style="margin-bottom: 12px">
+					<span class="detail-symbol" style="font-size: 14px">Send ${bal.symbol}</span>
+				</div>
+				<div class="send-form">
+					<div class="send-field">
+						<label class="send-label">Recipient</label>
+						<input
+							class="send-input"
+							type="text"
+							placeholder="0x..."
+							.value=${this.sendRecipient}
+							@input=${(e: InputEvent) => {
+								this.sendRecipient = (e.target as HTMLInputElement).value;
+								this.sendError = null;
+								this.host.requestUpdate();
+							}}
+						/>
+					</div>
+					<div class="send-field">
+						<label class="send-label">Amount</label>
+						<input
+							class="send-input"
+							type="text"
+							placeholder="0.0"
+							.value=${this.sendAmount}
+							@input=${(e: InputEvent) => {
+								this.sendAmount = (e.target as HTMLInputElement).value;
+								this.sendError = null;
+								this.host.requestUpdate();
+							}}
+						/>
+					</div>
+					${this.sendError
+						? html`<div class="send-error">${this.sendError}</div>`
+						: nothing}
+					<div class="send-actions">
+						<button
+							class="send-btn send-btn-cancel"
+							?disabled=${this.sendLoading}
+							@click=${() => {
+								this.showSendForm = false;
+								this.host.requestUpdate();
+							}}
+						>
+							Cancel
+						</button>
+						<button
+							class="send-btn send-btn-primary"
+							?disabled=${this.sendLoading || !this.sendRecipient.trim() || !this.sendAmount.trim()}
+							@click=${() => this.#executeSend(bal)}
+						>
+							${this.sendLoading ? 'Sending...' : 'Send'}
+						</button>
+					</div>
+				</div>
+			</div>
+		`;
+	}
+
+	async #executeSend(bal: NonNullable<typeof this.selectedBalance>): Promise<void> {
+		if (!this.#wallet || this.sendLoading) return;
+
+		const recipient = this.sendRecipient.trim();
+		const amountStr = this.sendAmount.trim();
+
+		if (!recipient.startsWith('0x') || recipient.length < 10) {
+			this.sendError = 'Invalid recipient address';
+			this.host.requestUpdate();
+			return;
+		}
+
+		const amountNum = parseFloat(amountStr);
+		if (isNaN(amountNum) || amountNum <= 0) {
+			this.sendError = 'Invalid amount';
+			this.host.requestUpdate();
+			return;
+		}
+
+		const amountMist = BigInt(Math.floor(amountNum * 10 ** bal.decimals));
+
+		this.sendLoading = true;
+		this.sendError = null;
+		this.host.requestUpdate();
+
+		try {
+			const { Transaction } = await import('@mysten/sui/transactions');
+			const tx = new Transaction();
+			const [coin] = tx.splitCoins(tx.gas, [amountMist]);
+			tx.transferObjects([coin], recipient);
+
+			const client = this.#wallet.activeClient;
+			if (!client) throw new Error('No active client');
+
+			const adapter = this.#wallet.getAdapterForAccount(this.activeAddress);
+			const managed = adapter?.getAccount(this.activeAddress);
+			if (!managed) throw new Error('No signer for account');
+
+			const { bytes, signature } = await tx.sign({ client: client as any, signer: managed.signer });
+			const { fromBase64 } = await import('@mysten/sui/utils');
+
+			await client.core.executeTransaction({
+				transaction: fromBase64(bytes),
+				signatures: [signature],
+			});
+
+			this.sendSuccess = true;
+
+			// Refresh balances
+			const el = (this.host as unknown as HTMLElement).shadowRoot?.querySelector?.(
+				'dev-wallet-balances',
+			) as any;
+			el?.refresh?.();
+		} catch (err) {
+			this.sendError = err instanceof Error ? err.message : 'Send failed';
+		} finally {
+			this.sendLoading = false;
+			this.host.requestUpdate();
+		}
 	}
 
 	// ── Subscriptions ───────────────────────────────────────────────────────

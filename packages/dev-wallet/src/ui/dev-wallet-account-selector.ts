@@ -6,12 +6,11 @@ import { css, html, LitElement, nothing } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 
 import type { SignerAdapter } from '../types.js';
-import { dropdownItemStyles, sharedStyles } from './styles.js';
 import { CopyController } from './copy-controller.js';
+import { dropdownItemStyles, sharedStyles } from './styles.js';
 import { emitEvent, findAdapterForAddress, formatAddress } from './utils.js';
 import './dev-wallet-dropdown.js';
 
-/** Short display names for adapter badges. */
 const ADAPTER_SHORT_NAMES: Record<string, string> = {
 	'WebCrypto Signer': 'WebCrypto',
 	'Remote CLI Signer': 'CLI',
@@ -29,137 +28,138 @@ export class DevWalletAccountSelector extends LitElement {
 				display: block;
 			}
 
-			.active-account {
+			/* -- Hero trigger (centered name + address + copy) -------------- */
+
+			.hero {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				padding: 8px 0 4px;
+			}
+
+			.hero-name-row {
 				display: flex;
 				align-items: center;
-				gap: 12px;
-				width: 100%;
-				padding: 12px 14px;
-				border-radius: var(--dev-wallet-radius);
-				background: var(--dev-wallet-secondary);
-				border: 1px solid var(--dev-wallet-border);
+				gap: 4px;
 				cursor: pointer;
-				transition: border-color 0.15s;
+				padding: 4px 8px;
+				border-radius: var(--dev-wallet-radius-sm);
 			}
 
-			.active-account:hover {
-				border-color: rgba(255, 255, 255, 0.15);
+			.hero-name-row:hover {
+				background: var(--dev-wallet-hover);
 			}
 
-			.avatar {
-				width: 34px;
-				height: 34px;
-				border-radius: 50%;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				font-size: 13px;
-				font-weight: var(--dev-wallet-font-weight-medium);
-				color: var(--dev-wallet-muted-foreground);
-				background: rgba(255, 255, 255, 0.08);
-				flex-shrink: 0;
-			}
-
-			.account-info {
-				flex: 1;
-				min-width: 0;
-			}
-
-			.account-label {
-				font-size: 14px;
-				font-weight: var(--dev-wallet-font-weight-medium);
+			.hero-name {
+				font-size: 16px;
+				font-weight: var(--dev-wallet-font-weight-semibold);
 				color: var(--dev-wallet-foreground);
-				white-space: nowrap;
-				overflow: hidden;
-				text-overflow: ellipsis;
 			}
 
-			.account-address {
-				font-size: 12px;
-				font-family: var(--dev-wallet-font-mono);
+			.hero-chevron {
+				width: 14px;
+				height: 14px;
 				color: var(--dev-wallet-tertiary);
 			}
 
-			.copy-btn {
-				width: 24px;
-				height: 24px;
+			.hero-address-row {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				margin-top: 2px;
+			}
+
+			.hero-address {
+				font-size: 13px;
+				font-family: var(--dev-wallet-font-mono);
+				color: var(--dev-wallet-muted-foreground);
+			}
+
+			.hero-copy {
+				width: 26px;
+				height: 26px;
 				display: flex;
 				align-items: center;
 				justify-content: center;
 				border-radius: var(--dev-wallet-radius-xs);
 				color: var(--dev-wallet-tertiary);
-				flex-shrink: 0;
-				font-size: 12px;
 			}
 
-			.copy-btn:hover {
+			.hero-copy svg {
+				width: 14px;
+				height: 14px;
+			}
+
+			.hero-copy:hover {
 				color: var(--dev-wallet-foreground);
 			}
 
-			.copy-btn.copied {
+			.hero-copy.copied {
 				color: var(--dev-wallet-positive);
 			}
 
-			.chevron {
-				width: 14px;
-				height: 14px;
-				color: var(--dev-wallet-tertiary);
+			/* -- Dropdown items --------------------------------------------- */
+
+			.dropdown-item .item-avatar {
+				width: 28px;
+				height: 28px;
+				border-radius: 50%;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 11px;
+				font-weight: var(--dev-wallet-font-weight-medium);
+				color: var(--dev-wallet-muted-foreground);
+				background: var(--dev-wallet-active);
 				flex-shrink: 0;
 			}
 
+			.dropdown-item[aria-selected='true'] .item-avatar {
+				background: var(--dev-wallet-primary);
+				color: var(--dev-wallet-primary-foreground);
+			}
+
 			.dropdown-item[aria-selected='true'] {
-				background: rgba(255, 255, 255, 0.06);
+				background: var(--dev-wallet-hover);
 			}
 
-			.dropdown-item .avatar {
-				width: 24px;
-				height: 24px;
-				font-size: 10px;
-			}
-
-			.dropdown-item .account-label {
-				font-size: 12px;
-			}
-
-			.dropdown-item .account-address {
-				font-size: 10px;
-			}
-
-			.dropdown-item .account-info {
+			.item-info {
+				flex: 1;
 				min-width: 0;
 			}
 
-			.dropdown-item .account-label {
+			.item-label {
+				font-size: 13px;
+				font-weight: var(--dev-wallet-font-weight-medium);
+				color: var(--dev-wallet-foreground);
 				overflow: hidden;
 				text-overflow: ellipsis;
 				white-space: nowrap;
 			}
 
-			.adapter-badge {
+			.item-address {
+				font-size: 11px;
+				font-family: var(--dev-wallet-font-mono);
+				color: var(--dev-wallet-tertiary);
+			}
+
+			.item-badge {
 				font-size: 9px;
 				padding: 2px 6px;
 				border-radius: 999px;
-				background: rgba(255, 255, 255, 0.06);
+				background: var(--dev-wallet-hover);
 				color: var(--dev-wallet-tertiary);
 				white-space: nowrap;
 			}
 
-			.selector-row {
-				display: flex;
-				gap: 4px;
-				align-items: center;
-			}
-
 			.selector-wrapper {
-				flex: 1;
-				min-width: 0;
-				--dropdown-max-height: 240px;
+				--dropdown-max-height: 260px;
 			}
 
 			.empty-state {
-				padding: 16px;
+				padding: 20px;
 				text-align: center;
-				font-size: 12px;
+				font-size: 13px;
 				color: var(--dev-wallet-muted-foreground);
 			}
 		`,
@@ -187,31 +187,25 @@ export class DevWalletAccountSelector extends LitElement {
 		}
 
 		const label = this.#getLabel(active);
-		const initial = (label[0] ?? '?').toUpperCase();
 
 		return html`
-			<div class="selector-row">
+			<div class="hero">
 				<dev-wallet-dropdown
-					full-width
 					class="selector-wrapper"
 					.open=${this._open}
 					@close=${() => (this._open = false)}
 				>
 					<button
 						slot="trigger"
-						class="active-account"
+						class="hero-name-row"
 						part="trigger"
 						aria-expanded=${this._open}
 						aria-haspopup="listbox"
 						@click=${() => (this._open = !this._open)}
 					>
-						<span class="avatar">${initial}</span>
-						<div class="account-info">
-							<div class="account-label">${label}</div>
-							<div class="account-address">${formatAddress(active.address)}</div>
-						</div>
+						<span class="hero-name">${label}</span>
 						<svg
-							class="chevron"
+							class="hero-chevron"
 							viewBox="0 0 24 24"
 							fill="none"
 							stroke="currentColor"
@@ -233,29 +227,31 @@ export class DevWalletAccountSelector extends LitElement {
 									aria-selected=${account.address === this.activeAddress}
 									@click=${() => this.#select(account)}
 								>
-									<span class="avatar">${accountInitial}</span>
-									<div class="account-info">
-										<div class="account-label">${accountLabel}</div>
-										<div class="account-address">${formatAddress(account.address)}</div>
+									<span class="item-avatar">${accountInitial}</span>
+									<div class="item-info">
+										<div class="item-label">${accountLabel}</div>
+										<div class="item-address">${formatAddress(account.address)}</div>
 									</div>
-									${adapterName ? html`<span class="adapter-badge">${adapterName}</span>` : nothing}
+									${adapterName ? html`<span class="item-badge">${adapterName}</span>` : nothing}
 								</button>
 							`;
 						})}
 					</div>
 				</dev-wallet-dropdown>
-				<button
-					class="copy-btn ${this.#copy.isCopied(active.address) ? 'copied' : ''}"
-					part="copy-button"
-					title="Copy address"
-					aria-label="Copy address"
-					@click=${(e: Event) => {
-						e.stopPropagation();
-						this.#copy.copy(active.address);
-					}}
-				>
-					${this.#copy.isCopied(active.address) ? '\u2713' : '\u2398'}
-				</button>
+				<div class="hero-address-row">
+					<span class="hero-address">${formatAddress(active.address)}</span>
+					<button
+						class="hero-copy ${this.#copy.isCopied(active.address) ? 'copied' : ''}"
+						part="copy-button"
+						title="Copy address"
+						aria-label="Copy address"
+						@click=${() => this.#copy.copy(active.address)}
+					>
+						${this.#copy.isCopied(active.address)
+							? html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>`
+							: html`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>`}
+					</button>
+				</div>
 			</div>
 		`;
 	}

@@ -5,7 +5,12 @@ import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 
 import type { DevWallet } from '../wallet/dev-wallet.js';
-import { actionBarStyles, connectDialogStyles, sharedStyles } from './styles.js';
+import {
+	actionBarStyles,
+	balanceDetailStyles,
+	connectDialogStyles,
+	sharedStyles,
+} from './styles.js';
 import { WalletController } from './wallet-controller.js';
 
 @customElement('dev-wallet-standalone')
@@ -14,6 +19,7 @@ export class DevWalletStandalone extends LitElement {
 		sharedStyles,
 		connectDialogStyles,
 		actionBarStyles,
+		balanceDetailStyles,
 		css`
 			:host {
 				display: flex;
@@ -37,14 +43,14 @@ export class DevWalletStandalone extends LitElement {
 
 			.card-header {
 				display: flex;
-				justify-content: space-between;
 				align-items: center;
-				padding: 16px 20px;
+				padding: 14px 16px;
 				border-bottom: 1px solid var(--dev-wallet-border);
+				gap: 10px;
 			}
 
 			.card-title {
-				font-size: 16px;
+				font-size: 14px;
 				font-weight: var(--dev-wallet-font-weight-semibold);
 				color: var(--dev-wallet-foreground);
 			}
@@ -53,6 +59,7 @@ export class DevWalletStandalone extends LitElement {
 				display: flex;
 				align-items: center;
 				gap: 10px;
+				margin-left: auto;
 			}
 
 			.status-indicator {
@@ -97,6 +104,19 @@ export class DevWalletStandalone extends LitElement {
 	bookmarkletOrigin = '';
 
 	#ctrl = new WalletController(this);
+	#mediaQuery: MediaQueryList | null = null;
+
+	override connectedCallback() {
+		super.connectedCallback();
+		this.#applyTheme();
+		this.addEventListener('setting-changed', this.#onSettingChanged as EventListener);
+	}
+
+	override disconnectedCallback() {
+		super.disconnectedCallback();
+		this.removeEventListener('setting-changed', this.#onSettingChanged as EventListener);
+		this.#mediaQuery?.removeEventListener('change', this.#onSystemThemeChange);
+	}
 
 	override willUpdate(changedProperties: Map<string, unknown>) {
 		if (changedProperties.has('wallet')) {
@@ -113,6 +133,36 @@ export class DevWalletStandalone extends LitElement {
 			dialog.showModal();
 		} else if (!this.#ctrl.pendingConnect && dialog?.open) {
 			dialog.close();
+		}
+	}
+
+	#onSettingChanged = (e: Event) => {
+		const detail = (e as CustomEvent).detail;
+		if (detail?.key === 'theme') this.#applyTheme();
+	};
+
+	#onSystemThemeChange = () => {
+		this.#applyTheme();
+	};
+
+	#applyTheme() {
+		let pref: string | null = null;
+		try {
+			pref = localStorage.getItem('dev-wallet:theme');
+		} catch {
+			// ignore
+		}
+
+		this.#mediaQuery?.removeEventListener('change', this.#onSystemThemeChange);
+
+		if (pref === 'light') {
+			this.setAttribute('theme', 'light');
+		} else if (pref === 'system') {
+			this.#mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
+			this.#mediaQuery.addEventListener('change', this.#onSystemThemeChange);
+			this.setAttribute('theme', this.#mediaQuery.matches ? 'light' : 'dark');
+		} else {
+			this.removeAttribute('theme');
 		}
 	}
 

@@ -7,7 +7,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 
 import type { DevWallet } from '../wallet/dev-wallet.js';
 import type { SignerAdapter } from '../types.js';
-import { sectionHeaderStyles, sharedStyles } from './styles.js';
+import { sectionHeaderStyles, settingsToggleStyles, sharedStyles } from './styles.js';
 import { emitEvent, formatAddress, getErrorMessage, NETWORK_COLORS } from './utils.js';
 import './dev-wallet-accounts.js';
 
@@ -16,6 +16,7 @@ export class DevWalletSettings extends LitElement {
 	static override styles = [
 		sharedStyles,
 		sectionHeaderStyles,
+		settingsToggleStyles,
 		css`
 			:host {
 				display: block;
@@ -96,7 +97,7 @@ export class DevWalletSettings extends LitElement {
 				width: 100%;
 				padding: 6px 10px;
 				border-radius: var(--dev-wallet-radius-sm);
-				border: 1px solid rgba(255, 255, 255, 0.15);
+				border: 1px solid var(--dev-wallet-border-med);
 				background: var(--dev-wallet-secondary);
 				color: var(--dev-wallet-foreground);
 				font-size: 12px;
@@ -130,7 +131,7 @@ export class DevWalletSettings extends LitElement {
 
 			.btn-icon:hover {
 				color: var(--dev-wallet-foreground);
-				background: rgba(255, 255, 255, 0.06);
+				background: var(--dev-wallet-hover);
 			}
 
 			.btn-icon-danger:hover {
@@ -155,7 +156,7 @@ export class DevWalletSettings extends LitElement {
 				width: 100%;
 				padding: 10px 12px;
 				border-radius: var(--dev-wallet-radius-sm);
-				border: 1px solid rgba(255, 255, 255, 0.1);
+				border: 1px solid var(--dev-wallet-border);
 				background: var(--dev-wallet-background);
 				color: var(--dev-wallet-foreground);
 				font-size: 13px;
@@ -327,7 +328,7 @@ export class DevWalletSettings extends LitElement {
 				right: 8px;
 				padding: 4px 10px;
 				border-radius: 999px;
-				background: rgba(255, 255, 255, 0.08);
+				background: var(--dev-wallet-active);
 				color: var(--dev-wallet-muted-foreground);
 				font-size: 11px;
 				font-family: inherit;
@@ -377,6 +378,24 @@ export class DevWalletSettings extends LitElement {
 	@state()
 	private _copied = false;
 
+	@state()
+	private _panelState: 'open' | 'closed' | 'remember' = 'open';
+
+	@state()
+	private _theme: 'system' | 'light' | 'dark' = 'dark';
+
+	override connectedCallback() {
+		super.connectedCallback();
+		try {
+			const ps = localStorage.getItem('dev-wallet:panel-state');
+			if (ps === 'open' || ps === 'closed' || ps === 'remember') this._panelState = ps;
+			const th = localStorage.getItem('dev-wallet:theme');
+			if (th === 'system' || th === 'light' || th === 'dark') this._theme = th;
+		} catch {
+			// localStorage unavailable
+		}
+	}
+
 	override render() {
 		return html`
 			<div class="section">${this.#renderNetworks()}</div>
@@ -384,6 +403,7 @@ export class DevWalletSettings extends LitElement {
 				? html`<div class="section">${this.#renderCliSigner()}</div>`
 				: nothing}
 			<div class="section">${this.#renderAccounts()}</div>
+			<div class="section">${this.#renderPreferences()}</div>
 			<div class="section">${this.#renderBookmarklet()}</div>
 			<div class="section">${this.#renderAbout()}</div>
 		`;
@@ -641,6 +661,62 @@ export class DevWalletSettings extends LitElement {
 				this._copied = false;
 			}, 2000);
 		});
+	}
+
+	#renderPreferences() {
+		return html`
+			<h3 class="section-header">Preferences</h3>
+			<div class="setting-row">
+				<span class="setting-label">Theme</span>
+				<div class="segmented-control">
+					${(['system', 'light', 'dark'] as const).map(
+						(val) => html`
+							<button
+								class="segment ${this._theme === val ? 'active' : ''}"
+								@click=${() => this.#setTheme(val)}
+							>
+								${val[0].toUpperCase() + val.slice(1)}
+							</button>
+						`,
+					)}
+				</div>
+			</div>
+			<div class="setting-row">
+				<span class="setting-label">Panel on load</span>
+				<div class="segmented-control">
+					${(['open', 'closed', 'remember'] as const).map(
+						(val) => html`
+							<button
+								class="segment ${this._panelState === val ? 'active' : ''}"
+								@click=${() => this.#setPanelState(val)}
+							>
+								${val[0].toUpperCase() + val.slice(1)}
+							</button>
+						`,
+					)}
+				</div>
+			</div>
+		`;
+	}
+
+	#setTheme(value: 'system' | 'light' | 'dark') {
+		this._theme = value;
+		try {
+			localStorage.setItem('dev-wallet:theme', value);
+		} catch {
+			// ignore
+		}
+		emitEvent(this, 'setting-changed', { key: 'theme', value });
+	}
+
+	#setPanelState(value: 'open' | 'closed' | 'remember') {
+		this._panelState = value;
+		try {
+			localStorage.setItem('dev-wallet:panel-state', value);
+		} catch {
+			// ignore
+		}
+		emitEvent(this, 'setting-changed', { key: 'panel-state', value });
 	}
 
 	#renderAbout() {

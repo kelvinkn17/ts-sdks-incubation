@@ -78,7 +78,7 @@ export class DevWalletAccounts extends LitElement {
 				width: 36px;
 				height: 36px;
 				border-radius: 50%;
-				background: rgba(255, 255, 255, 0.08);
+				background: var(--dev-wallet-active);
 				display: flex;
 				align-items: center;
 				justify-content: center;
@@ -149,7 +149,7 @@ export class DevWalletAccounts extends LitElement {
 			.edit-label-input {
 				padding: 4px 8px;
 				border-radius: var(--dev-wallet-radius-xs);
-				border: 1px solid rgba(255, 255, 255, 0.15);
+				border: 1px solid var(--dev-wallet-border-med);
 				background: var(--dev-wallet-secondary);
 				color: var(--dev-wallet-foreground);
 				font-size: 14px;
@@ -166,7 +166,7 @@ export class DevWalletAccounts extends LitElement {
 				font-size: 10px;
 				padding: 2px 8px;
 				border-radius: 999px;
-				background: rgba(255, 255, 255, 0.06);
+				background: var(--dev-wallet-hover);
 				color: var(--dev-wallet-tertiary);
 				font-weight: var(--dev-wallet-font-weight-medium);
 				text-transform: uppercase;
